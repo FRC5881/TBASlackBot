@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<!-- FRC5881 Unofficial TBA Slack Bot -->
+<!-- Copyright (c) 2016. -->
+<!-- -->
+<!-- This program is free software: you can redistribute it and/or modify it under the terms of the GNU -->
+<!-- Affero General Public License as published by the Free Software Foundation, either version 3 of -->
+<!-- the License, or any later version. -->
+<!-- -->
+<!-- This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; -->
+<!-- without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. -->
+<!-- See the GNU Affero General Public License for more details. -->
+<!-- -->
+<!-- You should have received a copy of the GNU Affero General Public License along with this -->
+<!-- program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Blue Alliance (Unofficial) Slack Bot Setup</title>
+</head>
+<body>
+<h1>The Blue Alliance<sup style="font-size: 50%">Unofficial</sup> Slack Bot Setup</h1>
+<p>The Blue Alliance<sup>Unofficial</sup> Slack Bot is an <b>Un-Official</b> project from the Programming Group of
+    FRC Team 5881, the Tech Valley High School Dragons and is not an official The Blue Alliance service. The bot was
+    originally intended to mirror the official TBA twitch bot for Slack teams.</p>
+<p>Currently, the bot is in a late-<b>alpha</b> state, with most query functions working properly. That said,
+    iteration in development has been on features and functions, not stability. In other words, you may find ways to
+    break the bot.</p>
+<p>If you are interested in testing, please feel free to add the bot to your Slack team with the link below,
+    after reading the instructions and warnings.</p>
+<h2>How to Use the Bot - and some Warnings</h2>
+<p>After setting up the bot, the bot will message the user that set it up with some basic information. By default,
+    the bot does not join any channels (including #general on your team). Team members can open a DM with the bot
+    and issue commands. Team members with appropriate permissions can <b>/invite</b> the bot into other channels.</p>
+<p><b>WARNING:</b> The Slack Event API (which the bot uses to receive messages) does not allow me, or you, to filter
+    what messages are received. The bot will receive <b>every message</b> in the channels the bot is in.</b> Currently
+    all messages the bot receives are logged temporarily to aid with debugging, therefore nothing said in a channel
+    the bot has been invited to is private. The message logging will change eventually as development moves on as I
+    have no interest in your channel chat. If this concerns you, simply don't invite the bot to any channels.</p>
+<h3>Interacting with the bot</h3>
+<p>The bot behaves slightly differently in a DM channel than other channels. In a DM channel you only need type your
+    command and the bot will respond. Everything typed in a 1:1 DM channel is considered a command. In a group or
+    regular channel, the bot is listening for it to be mentioned by name, eg <i>@tbabot</i>. In a non-DM channel you
+    can issue conversational commands in most cases. As long as all optional parameters to the command are included
+    the bot will ignore anything before it's name, or after the last command parameter expected.</p>
+<p>For example in a regular channel: "Guys did you know you can ask @tbabot info 5881 and get information on a team?"
+    or in a DM just type "info 5881"</p>
+<p>Command details are available by asking the bot for <b>help</b> in any channel</p>
+<h3>Subscribing to teams</h3>
+<p><b>(Alpha Feature)</b> You can subscribe to team competition updates on a channel-by-channel basis with the bot.
+    So your #general channel may subscribe to your team, but your DM channel may follow 254. Following a team across
+    multiple channels is supported, but you may find it gets a bit spammy as a user. As this feature is
+    being developed in the offseason, there are not any 'official' events ongoing with which to test, and the feature
+    is coded to the "it should work" standard.</p>
+<p>Presently there are 3 subscription types, <b>all</b>, which will give you exactly what you ask for, any update from
+    the TBA webhooks involving that team (upcoming match, match score, awards), <b>result</b> which will only send
+    match result updates, and finally <b>summary</b> which will give the team's final status at a completed event.
+    (summary is sent when awards are posted - if there are no awards in an offseason event, this will not trigger)</p>
+<h3>About bot permissions</h3>
+<p>The bot requests a number of permissions when you set it up. Many are used today, some are added for
+    soon-to-be-added features, and some are for future-proofing. Here's a list of the permissions we request and why
+    we request them (As shown in the authorization screen):</p>
+<ul>
+    <li>Confirm your identity -- This is added by Slack, we don't request it.</li>
+    <li>Access information about your channels and direct messages -- As the bot is added to / removed from channels
+        we use this permission to keep an updated channel list of where the bot has access to, and what kind of
+        channel it is.</li>
+    <li>Access information about your team -- This is a future-proofing request. The information we can access from
+        this only contains name, domain, and icon information.</li>
+    <li>Access your team's Do Not Disturb settings -- This is for a not-too-distant feature. This allows the bot to
+        see if a user is in do not disturb mode, and with the planned feature, not disturb you with any team
+        updates until you return.</li>
+    <li>Access your profile and your team's profile fields -- This is for a near feature, to reference the requester
+        by name in replies and make the conversational parser a bit more "human"</li>
+    <li>Send messages as The Blue Alliance Slack Bot -- Self explanatory</li>
+    <li>Add a bot user with the username @tbabot -- Self explanatory</li>
+    <li>Access your team's profile information -- See the profile access description above.</li>
+</ul>
+<h2>Bug, Problem, Feature Requests</h2>
+<p>For the time being, feel free to contact <i>bdaroz</i> on either Chief Delphi or Reddit. I typically check them a
+    few times during the day and will get back to you fairly quickly. Beta testers that received an email with setup
+    instructions may also email the sender for assistance as well. (In other words, I'd list my email here if I
+    didn't already get enough SPAM.)</p>
+<div align="center">
+    <a href="https://slack.com/oauth/authorize?scope=bot,channels:read,chat:write:bot,dnd:read,groups:read,im:read,mpim:read,team:read,users.profile:read,users:read&client_id=74043304640.74011404435">
+        <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png"
+             srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/>
+    </a>
+<!--
+<a href="https://slack.com/oauth/authorize?scope=commands,bot,channels:read,chat:write:bot,groups:read,groups:write,im:read,im:write,mpim:read,mpim:write,team:read,users.profile:read,users:read&client_id=74043304640.74011404435">
+    <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png"
+         srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/>
+</a>-->
+</div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<?php
+
+/*
+ * This is the settings configuration file for the TBA Slack Bot. YOU MUST COPY THIS FILE TO 'settings.php' AND
+ * EDIT IT BEFORE STARTING THE BOT. Do not edit this next line, or anything after the marker at the bottom.
+ */
+
+// Don't touch this line
+if (!defined('TBASLACKBOT')) {
+
+    /*
+     * Web server / Website Settings
+     */
+    
+    /**
+     * This is the full URL path at which these pages can be accessed. Include trailing slash. Must be https://
+     */
+    define('TBASLACKBOT_URLBASE', 'https://www.exampledomain.com/tbaslackbot/');
+
+    /*
+     * MYSQL Settings
+     */
+
+    /**
+     * Hostname, IP address, or 'localhost' (for socket) to connect to the MySQL Server. (Version 5.6 or higher)
+     */
+    define('TBASLACKBOT_MYSQL_HOST', 'localhost');
+
+    /**
+     * MySQL Username
+     */
+    define('TBASLACKBOT_MYSQL_USER', 'tbaslackbot');
+
+    /**
+     * MySQL Password
+     */
+    define('TBASLACKBOT_MYSQL_PASS', 'tbaslackbot');
+
+    /**
+     * MySQL Database Name
+     */
+    define('TBASLACKBOT_MYSQL_DB', 'tbaslackbot');
+
+
+    /*
+     * Slack Settings
+     */
+
+    /**
+     * Slack OAuth / Slack App Client ID
+     */
+    define('TBASLACKBOT_SLACK_CLIENT_ID', 'GET THIS FROM THE SLACK APP MANAGEMENT PAGE');
+
+    /**
+     * Slack OAuth / Slck App Client Secret -- THIS MUST NOT BE MADE PUBLIC
+     */
+    define('TBASLACKBOT_SLACK_CLIENT_SECRET', 'GET THIS FROM THE SLACK APP MANAGEMENT PAGE');
+
+    /**
+     * Slack Verification Token
+     */
+    define('TBASLACKBOT_SLACK_VERIFICATION_TOKEN', 'GET THIS FROM THE SLACK APP MANAGEMENT PAGE');
+
+    /*
+     * The Blue Alliance API Settings
+     */
+
+    /**
+     * TBA API X-App-ID String in the format <person's name>:<app name>:<version>
+     */
+    define('TBASLACKBOT_TBA_APP_ID', 'mynameis:tbaslackbot-fork:v00');
+
+    /**
+     * TBA API Verification String
+     */
+    define('TBASLACKBOT_TBA_VERIFICATION_STRING', 'GET THIS FROM THE TBA WEBHOOK MANAGEMENT PAGE');
+
+    /*
+     * Message Queue (POSIX) Settings
+     */
+
+    /**
+     * Slack POSIX Message Queue ID, should be unique on the server, and > 1024 but < 32767
+     */
+    define('TBASLACKBOT_SLACK_MQID', 25432);
+
+    /**
+     * TBA POSIX Message Queue ID, should be unique on the server, and > 1024 but < 32767, and not the same as the
+     * Slack Message Queue ID
+     */
+    define('TBASLACKBOT_TBA_MQID', 25431);
+
+    /**
+     * Default timezone. Set here or, set in php.ini and comment the following line.
+     */
+    date_default_timezone_set('America/New_York');
+
+
+    /*******************************
+     * DO NOT EDIT BELOW THIS LINE *
+     *******************************/
+
+    require_once('vendor/autoload.php');
+    require_once('autoload.php');
+
+    // Required to ensure settings are loaded
+    define('TBASLACKBOT', 1);
+}

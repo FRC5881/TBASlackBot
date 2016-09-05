@@ -1,0 +1,123 @@
+<?php
+// FRC5881 Unofficial TBA Slack Bot
+// Copyright (c) 2016.
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Affero General Public License as published by the Free Software Foundation, either version 3 of
+// the License, or any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License along with this
+// program.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Responsible for app setup and welcome to the installing user.
+ * @author Brian Rozmierski
+ */
+
+namespace TBASlackbot\slack;
+
+
+use React\EventLoop\Factory;
+use Slack\ApiClient;
+use Slack\DirectMessageChannel;
+use Slack\User;
+use TBASlackbot\utils\DB;
+
+class SlackSetup
+{
+
+    /**
+     * @var string
+     */
+    private $teamId;
+
+    /**
+     * @var DB
+     */
+    private $db;
+
+    /**
+     * @var array
+     */
+    private $oauth;
+
+    /**
+     * @var User
+     */
+    private $setupUser;
+
+    /**
+     * @var User
+     */
+    private $botUser;
+
+    /**
+     * SlackSetup constructor.
+     * @param $teamId string Slack team ID to setup
+     */
+    public function __construct($teamId)
+    {
+        $this->teamId = $teamId;
+
+        $this->db = new DB();
+
+        $this->oauth = $this->db->getSlackTeamOAuth($teamId);
+
+        if ($this->oauth['addedByUserId'])
+            return; // If this is set, presume the setup is complete.
+
+        $this->getSetupUser();
+        $this->getBotUser();
+
+        if ($this->setupUser && $this->botUser) {
+            $this->setupPrivateChannel();
+        } else {
+            error_log("Error getting setup and/or bot users");
+        }
+    }
+
+    private function getSetupUser() {
+        $loop = Factory::create();
+        $client = new ApiClient($loop);
+        $client->setToken($this->oauth['accessToken']);
+
+        $client->getAuthedUser()->then(function (User $user) {
+            $this->setupUser = $user;
+        });
+
+        $loop->run();
+    }
+
+    private function getBotUser() {
+        $loop = Factory::create();
+        $client = new ApiClient($loop);
+        $client->setToken($this->oauth['botAccessToken']);
+
+        $client->getAuthedUser()->then(function (User $user) {
+            $this->botUser = $user;
+        });
+
+        $loop->run();
+    }
+
+    private function setupPrivateChannel() {
+        $loop = Factory::create();
+        $client = new ApiClient($loop);
+        $client->setToken($this->oauth['botAccessToken']);
+        $client->getDMByUserId($this->setupUser->getId())->then(function (DirectMessageChannel $dm) use ($client) {
+            $this->db->setSlackChannelCache($this->teamId, $dm->getId(), '@'.$this->setupUser->getUsername(), 'im',
+                true);
+            $client->send("Hello! I'm The Blue Alliance Slackbot, <@" . $this->botUser->getId() . "|"
+                . $this->botUser->getUsername() . ">! I can monitor your favorite FRC "
+                . "teams either in private, or public channels. I can also lookup team information and competition "
+                . "status, records, and rankings. Just ask me for *_help_* and I can tell you more.", $dm);
+            $this->db->setSlackTeamOAuthAddedByUser($this->teamId, $this->setupUser->getId());
+        });
+
+        $loop->run();
+    }
+}

@@ -1,0 +1,17 @@
+{
+  "name" : "frc5881/tba-slack-bot",
+  "description" : "Unofficial Slack bot for The Blue Alliance",
+  "minimum-stability" : "dev",
+  "license" : "AGPL-3.0",
+  "authors": [
+    {
+      "name" : "bdaroz"
+    }
+  ],
+  "require": {
+    "php": ">=5.5",
+    "coderstephen/slack-client": "dev-master",
+    "adam-paterson/oauth2-slack": "1.1.2",
+    "guzzlehttp/guzzle": "~6.0"
+  }
+}
