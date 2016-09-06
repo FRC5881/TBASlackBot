@@ -121,7 +121,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("setSlackTeamOAuth DB Error: " . $stmt->error);
             return false;
         }
 
@@ -142,7 +142,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("setSlackTeamOAuthAddedByUser DB Error: " . $stmt->error);
             return false;
         }
 
@@ -186,7 +186,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("setSlackChannelCache DB Error: " . $stmt->error);
             return false;
         }
 
@@ -214,7 +214,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("setSlackUserCache DB Error: " . $stmt->error);
             return false;
         }
 
@@ -249,7 +249,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("setTBAApiCache DB Error: " . $stmt->error);
             return false;
         }
 
@@ -263,7 +263,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("setTBAApiCacheChecked DB Error: " . $stmt->error);
             return false;
         }
 
@@ -315,7 +315,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("setSlackTeamSubscription DB Error: " . $stmt->error);
             return false;
         }
 
@@ -330,7 +330,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("deleteSlackTeamSubscription DB Error: " . $stmt->error);
             return false;
         }
 
@@ -345,7 +345,7 @@ class DB
         $stmt->execute();
 
         if ($stmt->error) {
-            error_log("DB Error: " . $stmt->error);
+            error_log("logMessage DB Error: " . $stmt->error);
             return false;
         }
 

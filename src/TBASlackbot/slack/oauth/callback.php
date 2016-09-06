@@ -52,7 +52,7 @@ if (!isset($_GET['code'])) {
                 $db->setSlackTeamOAuth($data['team_id'], $data['access_token'], $data['scope'],
                     $data['team_name'], $data['bot']['bot_user_id'], $data['bot']['bot_access_token']);
                 //echo "Db Updated...<br/>\n";
-                $setup = new \TBASlackbot\slack\SlackSetup($data['team_id']);
+                new \TBASlackbot\slack\SlackSetup($data['team_id']);
             } else {
                 //echo "Something's wrong....<br/>";
                 //var_dump($data);
