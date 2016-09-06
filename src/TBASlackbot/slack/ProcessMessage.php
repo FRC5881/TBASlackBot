@@ -468,17 +468,19 @@ class ProcessMessage
 
         if ($activeEvent != null) {
             $activeEventRankings = $activeEvent->getEventRankings();
-            $ranking = $activeEventRankings->getRankingForTeam($teamStatusRequestedFor);
+            $ranking = $activeEventRankings->getRankingForTeam($team->getTeamNumber());
+            $activeEventRecord = $activeEvent->getEventRecordForTeam($team->getTeamNumber());
 
             $activeEventMatches = $activeEvent->getEventMatches();
-            $lastMatch = $activeEventMatches->getLastMatchForTeam($teamStatusRequestedFor);
-            $nextMatch = $activeEventMatches->getNextMatchForTeam($teamStatusRequestedFor);
+            $lastMatch = $activeEventMatches->getLastMatchForTeam($team->getTeamNumber());
+            $nextMatch = $activeEventMatches->getNextMatchForTeam($team->getTeamNumber());
 
             $output = "FRC Team " . $team->getTeamNumber() . " (" . $team->getNickname() . ") is currently at "
-                . $activeEvent->getShortName() . " " . ($activeEvent->isOfficial() ? '' : '(Unofficial) ')
+                . ($activeEvent->getShortName() == null ? $activeEvent->getName() : $activeEvent->getShortName())
+                . " " . ($activeEvent->isOfficial() ? '' : '(Unofficial) ')
                 . "and is ranked " . $ranking->getRank() . "/" . $activeEventRankings->getNumberOfRankedTeams()
-                . " with a record of ". $ranking->getWins() . "-" . $ranking->getLosses() . "-"
-                . $ranking->getTies() . " thru quals."
+                . " with a record of ". $activeEventRecord['wins'] . "-" . $activeEventRecord['losses'] . "-"
+                . $activeEventRecord['ties'] . "."
                 . ($lastMatch != null ? "\nLast Match: " . $lastMatch->getKey() : '')
                 . ($nextMatch != null ? "\nNext Match: " . $nextMatch->getKey() : '');
             self::sendReply($teamId, $channelCache, $output, $replyTo);
@@ -489,23 +491,26 @@ class ProcessMessage
 
         if ($lastEvent != null) {
             $lastEventRankings = $lastEvent->getEventRankings();
-            $rankingAtLastEvent = $lastEventRankings->getRankingForTeam($teamStatusRequestedFor);
+            $rankingAtLastEvent = $lastEventRankings->getRankingForTeam($team->getTeamNumber());
+            $lastEventRecord = $lastEvent->getEventRecordForTeam($team->getTeamNumber());
         }
 
         /** @noinspection PhpUndefinedVariableInspection */
         $output = "FRC Team " . $team->getTeamNumber() . " (" . $team->getNickname() . ") is currently not at "
             . "an active event. "
             . ($nextEvent == null ? 'I have no upcoming events for this team. '
-                : "They are scheduled to attend " . $nextEvent->getShortName()
+                : "They are scheduled to attend "
+                . ($nextEvent->getShortName() == null ? $nextEvent->getName() : $nextEvent->getShortName())
                 . ($nextEvent->isOfficial() ? '' : ' (Unofficial)')
                 . " starting on " . $nextEvent->getStartDate() . ". ")
             . ($lastEvent == null ? 'I have no completed events for this team. '
-                : "They last participated in " . $lastEvent->getShortName()
+                : "They last participated in "
+                . ($lastEvent->getShortName() == null ? $lastEvent->getName() : $lastEvent->getShortName())
                 . ($lastEvent->isOfficial() ? '' : ' (Unofficial)')
                     . ($rankingAtLastEvent == null ? '' : " and ranked " . $rankingAtLastEvent->getRank()
                 . "/" . $lastEventRankings->getNumberOfRankedTeams() . " with a record of "
-                . $rankingAtLastEvent->getWins() . "-" . $rankingAtLastEvent->getLosses() . "-"
-                . $rankingAtLastEvent->getTies() . " thru quals") . ".");
+                . $lastEventRecord['wins'] . "-" . $lastEventRecord['losses'] . "-"
+                . $lastEventRecord['ties']) . ".");
 
         self::sendReply($teamId, $channelCache, $output, $replyTo);
     }
