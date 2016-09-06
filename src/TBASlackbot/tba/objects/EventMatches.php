@@ -63,7 +63,7 @@ class EventMatches
     }
 
     /**
-     * @param $team
+     * @param int $team Team number
      * @return null|EventMatch
      */
     public function getNextMatchForTeam($team) {
@@ -84,7 +84,7 @@ class EventMatches
     }
 
     /**
-     * @param $team
+     * @param int $team Team number
      * @return null|EventMatch
      */
     public function getLastMatchForTeam($team) {
@@ -105,7 +105,7 @@ class EventMatches
     }
 
     /**
-     * @param string $team Team code as frcXXXX
+     * @param int $team Team number
      * @return EventMatch[]
      */
     public function getMatchesForTeam($team) {

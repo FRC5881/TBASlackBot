@@ -52,7 +52,7 @@ class EventMatch
     /**
      * Gets the code for the competition level the match is in.
      *
-     * @return string 'qm', 'qf', 'sf', 'f'
+     * @return string 'qm', 'ef', 'qf', 'sf', 'f'
      */
     public function getCompetitionLevel() {
         return $this->data->comp_level;

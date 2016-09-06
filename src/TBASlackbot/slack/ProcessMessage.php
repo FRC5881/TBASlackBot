@@ -336,6 +336,13 @@ class ProcessMessage
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
+                    $attachment =  new Attachment('Event Eliminations and Detail - Sept 6, 2016',
+                        '*_detail_* now lists Eighth-finalists, quarterfinalists, and semifinalists in the awards '
+                        . 'section of the event. We welcome feedback on it\'s placement, and we know full well it\'s '
+                        . 'not an official award, however, from an ease of use standpoint it seemed best.');
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
                     $attachment =  new Attachment('Improvements & Feedback Requested - Sept 6, 2016',
                         '*_detail_* now links the event title to the TBA Event page for further analysis. A new info '
                         . 'style update is available for testing, and your feedback is requested. Try '
@@ -351,7 +358,7 @@ class ProcessMessage
 
                     $attachment =  new Attachment('Command Changes - Sept 5, 2016', 'Changes have been made to the '
                         . '*_info_* command such that it now has additional information. Also, sending a team number '
-                        . 'in place of a command will now return the short info form that *_info_* used to provide');
+                        . 'in place of a command will now return the short info form that *_info_* used to provide.');
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
                     self::sendReply($teamId, $channelCache, $helpText, $replyTo, $attachments);
@@ -536,6 +543,7 @@ class ProcessMessage
             foreach($events as $event) {
                 $rankings = $event->getEventRankings();
                 $eventRecord = $event->getEventRecordForTeam($team->getTeamNumber());
+                $highestCompLevel = $event->getHighestCompLevelForTeam($team->getTeamNumber());
                 $rank = null;
 
                 if ($rankings) {
@@ -550,8 +558,14 @@ class ProcessMessage
                 $awards = $tba->getTeamEventAwards('frc' . $teamInfoRequestedFor,
                     $event->getYear() . $event->getEventCode());
 
-                if ($awards && count($awards) > 0) {
+                if ($awards && count($awards) > 0 || ($highestCompLevel !== 'f' && $highestCompLevel !== 'qm')) {
                     $eventText .= " and won the following awards:";
+
+                    if ($highestCompLevel !== 'f' && $highestCompLevel !== 'qm') {
+                        $eventText .= "\n• " . ($highestCompLevel === 'ef' ? 'Eighth-Finalist'
+                                : ($highestCompLevel === 'qf' ? 'Quarterfinalist'
+                                    : ($highestCompLevel === 'sf' ? 'Semifinalist' : '')));
+                    }
 
                     foreach($awards as $award) {
                         $eventText .= "\n• " . $award->getName();

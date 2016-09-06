@@ -292,7 +292,7 @@ class Event
     /**
      * Gets the matches for the team at this event.
      *
-     * @param string $team Team number as 'frcXXXX'
+     * @param int $team Team number
      * @return EventMatch[] Array of event matches for this team, may be empty
      */
     public function getEventMatchesForTeam($team) {
@@ -302,7 +302,7 @@ class Event
     /**
      * Gets the W-L-T record for the team at this event across all matches.
      *
-     * @param string $team Team number as 'frcXXXX'
+     * @param int $team Team number
      * @return array of 'wins', 'losses', and 'ties'
      */
     public function getEventRecordForTeam($team) {
@@ -329,6 +329,33 @@ class Event
         }
 
         return array('wins' => $wins, 'losses' => $losses, 'ties' => $ties);
+    }
+
+    /**
+     * Gets the highest competition level the team played in at the event
+     *
+     * @param int $team Team number
+     * @return string 'qm', 'ef', 'qf', 'sf', 'f'
+     */
+    public function getHighestCompLevelForTeam($team) {
+        $matches = $this->getEventMatchesForTeam($team);
+        $highCompLevel = 'qm'; //qm, ef, qf, sf, f
+
+        foreach($matches as $match) {
+            $compLevel = $match->getCompetitionLevel();
+            if ($compLevel == 'f') {
+                // Nothing higher...
+                return $compLevel;
+            } else if ($compLevel == 'sf') {
+                $highCompLevel = $compLevel;
+            } else if ($compLevel == 'qf' && $highCompLevel !== 'sf') {
+                $highCompLevel = $compLevel;
+            } else if ($compLevel == 'ef' && $highCompLevel === 'qm') {
+                $highCompLevel = $compLevel;
+            }
+        }
+
+        return $highCompLevel;
     }
 
     /**
