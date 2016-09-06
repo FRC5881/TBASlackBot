@@ -11,7 +11,7 @@ subsection), as well as hooks/callbacks (in the `hooks` subsection). The `tba` s
 API calls and callbacks, while the `daemon` section is a PHP background process to manage the inbound events from
 both TBA and Slack and respond as needed. 
 
-In general terms, the app slurps the TBA firehose, posting those inbound TBA events to a message queue for the daemon to
+In general terms, the app slurps the TBA fire hose, posting those inbound TBA events to a message queue for the daemon to
 process. The daemon processes those events to determine if any of them need to be posted to slack, and the work to do so
 is done in the daemon thread. Conversely, the Slack events are sent to another message queue for processing in the
 daemon thread.
@@ -32,7 +32,7 @@ It is responsible for any look ups or other processing to be done, including sen
 
 ### TBA
 
-From the TBA side, the `hooks` subsection receives all callbacks from the TBA firehose, and places those in a message
+From the TBA side, the `hooks` subsection receives all callbacks from the TBA fire hose, and places those in a message
 queue. The `daemon` section then is responsible for taking those messages, determining if they are relevant to any bot
 subscriptions, and sending messages back to Slack as needed.
 

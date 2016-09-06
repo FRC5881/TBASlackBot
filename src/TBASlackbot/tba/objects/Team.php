@@ -13,20 +13,20 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * TBA Team Object
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba\objects;
 
 
 use TBASlackbot\tba\TBAClient;
 
+/**
+ * TBA Team Object.
+ * @author Brian Rozmierski
+ */
 class Team
 {
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
@@ -37,10 +37,10 @@ class Team
 
     /**
      * Team constructor.
-     * @param $TBAClient TBAClient
-     * @param $data array returned from team API
+     * @param TBAClient $TBAClient
+     * @param \stdClass $data returned from team API
      */
-    public function __construct(TBAClient $TBAClient, $data)
+    public function __construct(TBAClient $TBAClient, \stdClass $data)
     {
         $this->tba = $TBAClient;
         $this->data = $data;
@@ -49,7 +49,9 @@ class Team
     }
 
     /**
-     * @return string Website URL
+     * Gets the team website, if not the default.
+     *
+     * @return string|null Website URL or null if the default value is present
      */
     public function getWebsite() {
         if ($this->data->website === "http://www.firstinspires.org/") {
@@ -60,6 +62,8 @@ class Team
     }
 
     /**
+     * Gets the full team name.
+     *
      * @return string Full (long, sponsor-filled) team name
      */
     public function getName() {
@@ -67,6 +71,8 @@ class Team
     }
 
     /**
+     * Gets the city the team is in.
+     *
      * @return string Locality/City
      */
     public function getLocality() {
@@ -74,6 +80,8 @@ class Team
     }
 
     /**
+     * Gets the team's rookie year.
+     *
      * @return int Year the team was a rookie
      */
     public function getRookieYear() {
@@ -81,6 +89,8 @@ class Team
     }
 
     /**
+     * Gets the team's region/state.
+     *
      * @return string Region/State
      */
     public function getRegion() {
@@ -88,6 +98,8 @@ class Team
     }
 
     /**
+     * Gets the team number.
+     *
      * @return int team number
      */
     public function getTeamNumber() {
@@ -95,6 +107,8 @@ class Team
     }
 
     /**
+     * Gets the team's location, city, state, and country.
+     *
      * @return string Location (city/state/country)
      */
     public function getLocation() {
@@ -102,6 +116,8 @@ class Team
     }
 
     /**
+     * Gets the team key.
+     *
      * @return string TBA team key (frc9999)
      */
     public function getKey() {
@@ -109,6 +125,8 @@ class Team
     }
 
     /**
+     * Gets the country name the team is in.
+     *
      * @return string Country name
      */
     public function getCountryName() {
@@ -116,13 +134,17 @@ class Team
     }
 
     /**
-     * @return string Optional team motto
+     * Gets the team motto.
+     *
+     * @return string|null Optional team motto
      */
     public function getMotto() {
         return $this->data->motto;
     }
 
     /**
+     * Gets the team nickname.
+     *
      * @return string Team nickname (common short name)
      */
     public function getNickname() {
@@ -130,7 +152,9 @@ class Team
     }
 
     /**
-     * @param $year int
+     * Gets the district the team is/was in in a given year.
+     *
+     * @param int $year
      * @return null|District
      */
     public function getDistrict($year) {
@@ -151,7 +175,9 @@ class Team
     }
 
     /**
-     * @param $year int
+     * Gets the events for the team for hte given year.
+     *
+     * @param int $year
      * @return Event[]
      */
     public function getTeamEvents($year) {
@@ -167,7 +193,8 @@ class Team
 
     /**
      * Gets the "next" event based on today, but does need the season year to search from.
-     * @param $year int
+     *
+     * @param int $year
      * @return null|Event
      */
     public function getTeamNextEvent($year) {
@@ -186,7 +213,8 @@ class Team
 
     /**
      * Gets the "last" event based on today, but does need the season year to search from.
-     * @param $year int
+     *
+     * @param int $year
      * @return null|Event
      */
     public function getTeamLastEvent($year) {
@@ -205,7 +233,8 @@ class Team
 
     /**
      * Gets the "active" event based on today, but does need the season year to search from.
-     * @param $year int
+     *
+     * @param int $year
      * @return null|Event
      */
     public function getTeamActiveEvent($year) {
@@ -218,6 +247,14 @@ class Team
         return null;
     }
 
+    /**
+     * Gets the team's record during qualification matches for the given year.
+     *
+     * @param int $year
+     * @return array|null null if no matches complete, otherwise array with official and unofficial wins losses and
+     * ties, eg 'unofficialWins' or 'officialTies', as well as 'wins', 'losses', and 'ties' overall. Also includes
+     * 'officialCompetitions' and 'unofficialCompetitions'.
+     */
     public function getTeamQualificationRecord($year) {
         $events = $this->getTeamEvents($year);
 
@@ -263,6 +300,14 @@ class Team
             'competitions' => $officialCompetitions + $unofficialCompetitions];
     }
 
+    /**
+     * Gets the team's record across all matches for the given year.
+     *
+     * @param int $year
+     * @return array|null null if no matches complete, otherwise array with official and unofficial wins losses and
+     * ties, eg 'unofficialWins' or 'officialTies', as well as 'wins', 'losses', and 'ties' overall. Also includes
+     * 'officialCompetitions' and 'unofficialCompetitions'.
+     */
     public function getTeamRecord($year) {
         $events = $this->getTeamEvents($year);
 

@@ -13,33 +13,36 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * A single Event Match from the TBA API
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba\objects;
 
 
 use TBASlackbot\tba\objects\yearspecific\ScoreBreakdown2016;
 
+/**
+ * A single Event Match from the TBA API.
+ * @author Brian Rozmierski
+ */
 class EventMatch
 {
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
     /**
      * Event Match constructor.
-     * @param $data array returned from event match API
+     *
+     * @param \stdClass $data returned from event match API
      */
-    public function __construct($data)
+    public function __construct(\stdClass $data)
     {
         $this->data = $data;
     }
 
     /**
+     * Gets the match key.
+     *
      * @return string
      */
     public function getKey() {
@@ -47,74 +50,107 @@ class EventMatch
     }
 
     /**
-     * @return string
+     * Gets the code for the competition level the match is in.
+     *
+     * @return string 'qm', 'qf', 'sf', 'f'
      */
     public function getCompetitionLevel() {
         return $this->data->comp_level;
     }
 
     /**
-     * @return int
+     * For elimination matches, the match number in the set.
+     *
+     * @return int|null Match set number, or null if not in elims
      */
     public function getSetNumber() {
         return $this->data->set_number;
     }
 
     /**
-     * @return int
+     * For qualification matches the match number.
+     *
+     * @return int match number
      */
     public function getMatchNumber() {
         return $this->data->match_number;
     }
 
     /**
+     * The alliances in this match.
+     *
      * @return Alliances
      */
     public function getAlliances() {
         return new Alliances($this->data->alliances);
     }
 
+    /**
+     * The score breakdown, if available, for this match.
+     *
+     * @return \stdClass|null
+     */
     public function getScoreBreakdown() {
         return $this->data->score_breakdown;
     }
 
     /**
-     * @return string
+     * Gets the event key that this match takes place at.
+     *
+     * @return string Event key
      */
     public function getEventKey() {
         return $this->data->event_key;
     }
 
+    /**
+     * Gets the videos of this match.
+     *
+     * @return \stdClass[]
+     */
     public function getVideos() {
         return $this->data->videos;
     }
 
     /**
-     * @return string
+     * Gets the match time as a string.
+     *
+     * @return string|null Match time as string, seems to be null more often than it's not
      */
     public function getTimeString() {
         return $this->data->time_string;
     }
 
     /**
-     * @return int
+     * Gets the scheduled match time.
+     *
+     * @return int Scheduled match time as UNIX Epoch
      */
     public function getTime() {
         return $this->data->time;
     }
 
+    /**
+     * Gets the year this match took place.
+     *
+     * @return int Year
+     */
     public function getYear() {
         return substr($this->getEventKey(), 0, 4);
     }
 
     /**
-     * @return bool
+     * Notes if this match is complete.
+     *
+     * @return bool true if either the score breakdown is present, or an alliance has a score applied
      */
     public function isComplete() {
         return $this->getScoreBreakdown() != null || $this->getAlliances()->getBlueScore() != null;
     }
 
     /**
+     * Gets the name of the winning alliance.
+     *
      * @return null|string red or blue or null if tied
      */
     public function getWinningAlliance() {
@@ -194,6 +230,8 @@ class EventMatch
     }
 
     /**
+     * Red or Blue helper to make tie breaking reporting easier.
+     *
      * @param int $red red score
      * @param int $blue blue score
      * @param bool $invert false to return the higher score, true to return lower score

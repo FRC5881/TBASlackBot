@@ -13,18 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * TBA District Object
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba\objects;
 
-
+/**
+ * TBA District Object.
+ * @author Brian Rozmierski
+ */
 class District
 {
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
@@ -35,24 +34,29 @@ class District
 
     /**
      * District constructor.
-     * @param $data array returned from district API
-     * @param $year int year from the API for this district
+     *
+     * @param \stdClass $data returned from district API
+     * @param int $year year from the API for this district
      */
-    public function __construct($data, $year)
+    public function __construct(\stdClass $data, $year)
     {
         $this->data = $data;
         $this->year = $year;
     }
 
     /**
-     * @return string
+     * Gets the name of the district.
+     *
+     * @return string district name
      */
     public function getName() {
         return $this->data->name;
     }
 
     /**
-     * @return string
+     * Gets the key to identify the district
+     *
+     * @return string district key
      */
     public function getKey() {
         return $this->data->key;
@@ -61,9 +65,10 @@ class District
     /**
      * Since the TBA v2 Team History API uses the format <year><district> as the key for district history, we
      * present a compatible version here.
+     *
      * @return string Key prepended with the year
      */
     public function getYearKey() {
-        return $this->year.$this->getKey();
+        return $this->year . $this->getKey();
     }
 }

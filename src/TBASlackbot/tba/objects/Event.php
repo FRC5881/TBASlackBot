@@ -13,20 +13,20 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * TBA Event Object
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba\objects;
 
 
 use TBASlackbot\tba\TBAClient;
 
+/**
+ * TBA Event Object.
+ * @author Brian Rozmierski
+ */
 class Event
 {
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
@@ -37,8 +37,9 @@ class Event
 
     /**
      * Event constructor.
-     * @param $TBAClient TBAClient
-     * @param $data array returned from API containing a single event record
+     *
+     * @param TBAClient $TBAClient
+     * @param \stdClass $data returned from API containing a single event record
      */
     public function __construct(TBAClient $TBAClient, $data)
     {
@@ -47,6 +48,8 @@ class Event
     }
 
     /**
+     * Gets the event key.
+     *
      * @return string TBA event key
      */
     public function getKey() {
@@ -54,25 +57,31 @@ class Event
     }
 
     /**
-     * @return string Website URL
+     * Gets the team website URL.
+     *
+     * @return string|null Website URL
      */
     public function getWebsite() {
         return $this->data->website;
     }
 
     /**
+     * Denotes if this is an official in-season FIRST event.
+     *
      * @return bool true if an official event
      */
     public function isOfficial() {
-        // Yeah, this is broken. It's if it uses official FMS, not offseasion. See TBA GitHub #1607
+        // Yeah, this is broken. It's if it uses official FMS, not off-season. See TBA GitHub #1607
         //return $this->data->official;
 
         // https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L38
-        // 10 is an arbitrary number in case additional types are added. All offseason/preseason is >90
+        // 10 is an arbitrary number in case additional types are added. All off-season/preseason is >90
         return $this->getEventType() < 10;
     }
 
     /**
+     * Get event ending date string.
+     *
      * @return string Event end date as yyyy-mm-dd
      */
     public function getEndDate() {
@@ -80,13 +89,17 @@ class Event
     }
 
     /**
-     * @return int
+     * Get event ending date as timestamp.
+     *
+     * @return int Event end date as UNIX Epoch
      */
     public function getEndDateTimestamp() {
         return date_create_from_format("Y-m-d", $this->getEndDate())->getTimestamp();
     }
 
     /**
+     * Gets the event name.
+     *
      * @return string Event name
      */
     public function getName() {
@@ -94,20 +107,26 @@ class Event
     }
 
     /**
-     * @return string Event short name
+     * Gets the event short name.
+     *
+     * @return string|null Event short name
      */
     public function getShortName() {
         return $this->data->short_name;
     }
 
     /**
-     * @return string If a district event, name of the district, otherwise null
+     * Gets the name of the district the event is in.
+     *
+     * @return string|null If a district event, name of the district, otherwise null
      */
     public function getDistrictEventString() {
         return $this->data->event_district_string;
     }
 
     /**
+     * Gets the event venue address.
+     *
      * @return string Event venue address, may include newline escape strings \n
      */
     public function getVenueAddress() {
@@ -115,7 +134,9 @@ class Event
     }
 
     /**
-     * @return int District Id
+     * Gets the TBA District ID for the event.
+     *
+     * @return int|null District Id
      * @link https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/district_type.py#L6
      */
     public function getEventDistrict() {
@@ -123,6 +144,8 @@ class Event
     }
 
     /**
+     * Gets the location of the event.
+     *
      * @return string Location, city, state, country
      */
     public function getLocation() {
@@ -130,6 +153,8 @@ class Event
     }
 
     /**
+     * Gets the event code.
+     *
      * @return string Event code
      */
     public function getEventCode() {
@@ -137,6 +162,8 @@ class Event
     }
 
     /**
+     * Gets the year the event is to be held.
+     *
      * @return int Year the event is to be held
      */
     public function getYear() {
@@ -151,6 +178,8 @@ class Event
     }
 
     /**
+     * Gets the fully-formed timezone for the event.
+     *
      * @return string Timezone of the event (eg America/New_York)
      */
     public function getTimeZone() {
@@ -158,13 +187,18 @@ class Event
     }
 
     /**
-     * @return array Elimination Alliances
+     * Gets the alliances for the elimination rounds of the event.
+     *
+     * @return array|null Elimination Alliances
      */
     public function getAlliances() {
+        // TODO use Alliance class
         return $this->data->alliances;
     }
 
     /**
+     * Gets the event type.
+     *
      * @return string Event Type
      */
     public function getEventTypeString() {
@@ -172,6 +206,8 @@ class Event
     }
 
     /**
+     * Get event starting date string.
+     *
      * @return string Event start date as yyyy-mm-dd
      */
     public function getStartDate() {
@@ -179,7 +215,9 @@ class Event
     }
 
     /**
-     * @return int
+     * Get event string date as timestamp.
+     *
+     * @return int Event start date as UNIX Epoch
      */
     public function getStartDateTimestamp() {
         $existing = date_default_timezone_get();
@@ -193,6 +231,8 @@ class Event
     }
 
     /**
+     * Gets the TBA event type code for this event.
+     *
      * @return int Event Type
      * @link https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2
      */
@@ -201,27 +241,35 @@ class Event
     }
 
     /**
-     * @return bool
+     * Notes if this event is scheduled for the future.
+     *
+     * @return bool true if starting in the future
      */
     public function isFuture() {
         return $this->getStartDateTimestamp() > time();
     }
 
     /**
-     * @return bool
+     * Notes if this event has ended.
+     *
+     * @return bool true if ending in the past
      */
     public function isPast() {
         return $this->getEndDateTimestamp() < time();
     }
 
     /**
-     * @return bool
+     * Notes if this event is currently scheduled to be in progress.
+     *
+     * @return bool true if the event start but not end date has passed
      */
     public function isUnderway() {
         return $this->getStartDateTimestamp() < time() && time() < $this->getEndDateTimestamp();
     }
 
     /**
+     * Gets the event rankings for this event.
+     *
      * @return null|EventRankings
      */
     public function getEventRankings() {
@@ -229,6 +277,8 @@ class Event
     }
 
     /**
+     * Gets the event matches for this event.
+     *
      * @return null|EventMatches
      */
     public function getEventMatches() {
@@ -240,19 +290,23 @@ class Event
     }
 
     /**
-     * @param $teamNumber
-     * @return EventMatch[]
+     * Gets the matches for the team at this event.
+     *
+     * @param string $team Team number as 'frcXXXX'
+     * @return EventMatch[] Array of event matches for this team, may be empty
      */
-    public function getEventMatchesForTeam($teamNumber) {
-        return $this->getEventMatches()->getMatchesForTeam($teamNumber);
+    public function getEventMatchesForTeam($team) {
+        return $this->getEventMatches()->getMatchesForTeam($team);
     }
 
     /**
-     * @param $teamNumber
-     * @return array of wins losses and ties
+     * Gets the W-L-T record for the team at this event across all matches.
+     *
+     * @param string $team Team number as 'frcXXXX'
+     * @return array of 'wins', 'losses', and 'ties'
      */
-    public function getEventRecordForTeam($teamNumber) {
-        $matches = $this->getEventMatchesForTeam($teamNumber);
+    public function getEventRecordForTeam($team) {
+        $matches = $this->getEventMatchesForTeam($team);
         $wins = 0;
         $losses = 0;
         $ties = 0;
@@ -263,7 +317,7 @@ class Event
             if ($winningAlliance == null) {
                 $ties++;
             } else {
-                $alliance = $match->getAlliances()->getAllianceForTeam($teamNumber);
+                $alliance = $match->getAlliances()->getAllianceForTeam($team);
                 // Note, it can't be null since we're already in the match somewhere....
 
                 if ($alliance == $winningAlliance) {
@@ -277,6 +331,13 @@ class Event
         return array('wins' => $wins, 'losses' => $losses, 'ties' => $ties);
     }
 
+    /**
+     * Comparator to compare two events by their start date.
+     *
+     * @param Event $a Event to compare
+     * @param Event $b Event to compare
+     * @return int <= -1 if $a earlier than $b, 0 if the same time, or >= 1 if $b earlier than $a
+     */
     public static function compareByStartDate(Event $a, Event $b) {
         return $a->getStartDateTimestamp() - $b->getStartDateTimestamp();
     }

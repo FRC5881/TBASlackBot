@@ -29,7 +29,3 @@ function checkDatabase() {
 
     return true;
 }
-
-function createTables($mysqli) {
-
-}

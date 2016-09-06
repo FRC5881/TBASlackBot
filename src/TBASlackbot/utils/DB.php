@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace TBASlackbot\utils;
+
 /**
  * Database Interface class. All database interactions should be done through this class.
  * @author Brian Rozmierski
  */
-
-namespace TBASlackbot\utils;
-
 class DB
 {
 
@@ -57,6 +57,9 @@ class DB
         $this->tableCheck();
     }
 
+    /**
+     * Check to make sure the required tables are present in the database, does not check fields, however.
+     */
     private function tableCheck() {
         $expectedTables = array('slackChannelCache', 'slackOAuth', 'slackTeamSubscriptions', 'slackUserCache');
 
@@ -193,6 +196,11 @@ class DB
         return true;
     }
 
+    /**
+     * Gets the cached Slack User information for the given Id
+     * @param string $userId Slack UserId
+     * @return array with fields named the same as the setter's parameters as well as 'lastAccess'
+     */
     public function getSlackUserCache($userId) {
         $stmt = $this->mysqli->prepare("SELECT * FROM slackUserCache WHERE userId = ?");
         $stmt->bind_param("s", $userId);
@@ -204,6 +212,14 @@ class DB
         return $res->fetch_assoc();
     }
 
+    /**
+     * Insert or update the Slack user cache.
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $userId Slack UserId
+     * @param string $userName User name
+     * @return bool true on successful insert/update
+     */
     public function setSlackUserCache($teamId, $userId, $userName) {
         $stmt = $this->mysqli->prepare("INSERT INTO slackUserCache (teamId, userId, lastAccess, userName) "
             . "VALUES (?, ?, now(), ?) "
@@ -221,6 +237,13 @@ class DB
         return true;
     }
 
+    /**
+     * Gets a cached TBA API call.
+     *
+     * @param string $apiCall TBA API URL stub containing the API call
+     * @return array|bool false if no records returned, or an array with the 'apiCall', 'lastModified' formatted for
+     * the HTTP header, 'lastModifiedUnix' as a UNIX timestamp, 'apiJsonString', and 'lastRetrieval'
+     */
     public function getTBAApiCache($apiCall) {
         $stmt = $this->mysqli->prepare("SELECT apiCall, "
             . "DATE_FORMAT(lastModified, '%a, %e %b %Y %H:%i:%s GMT') as lastModified, "
@@ -239,6 +262,14 @@ class DB
         }
     }
 
+    /**
+     * Insert or update the TBA API cache.
+     *
+     * @param string $apiCall TBA API URL stub containing the API call
+     * @param string $lastModified HTTP RFC formatted date string of last modification by the TBA server
+     * @param string $json raw JSON string returned by the API
+     * @return bool true on successful insert/update
+     */
     public function setTBAApiCache($apiCall, $lastModified, $json) {
         $stmt = $this->mysqli->prepare("INSERT INTO tbaApiCache (apiCall, lastModified, apiJsonString, lastRetrieval) "
             . "VALUES (?, STR_TO_DATE(?, '%a, %e %b %Y %H:%i:%s GMT'), ?, now()) "
@@ -256,6 +287,13 @@ class DB
         return true;
     }
 
+    /**
+     * Updates the lastRetrieval time for a given API call, used when the cache expired but the TBA version hasn't
+     * changed.
+     *
+     * @param string $apiCall TBA API URL stub containing the API call
+     * @return bool true on successful update
+     */
     public function setTBAApiCacheChecked($apiCall) {
         $stmt = $this->mysqli->prepare("UPDATE tbaApiCache SET lastRetrieval = now() WHERE apiCall = ?");
         $stmt->bind_param('s', $apiCall);
@@ -270,6 +308,15 @@ class DB
         return true;
     }
 
+    /**
+     * Gets an individual team subscription record.
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $channelId Slack ChannelId
+     * @param int $frcTeam FRC team number
+     * @return array|bool false if no subscription found, or an array with 'teamId', 'channelId', 'frcTeam',
+     * 'subscriptionType' and 'subscribedByUserId'
+     */
     public function getSlackTeamSubscription($teamId, $channelId, $frcTeam) {
         $stmt = $this->mysqli->prepare("SELECT * FROM slackTeamSubscriptions WHERE teamId = ? AND channelId = ? "
             . "AND frcTeam = ?");
@@ -286,6 +333,14 @@ class DB
         }
     }
 
+    /**
+     * Gets a list of FRC teams subscribed to by a channel.
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $channelId Slack ChannelId
+     * @return array[]|bool false if no subscription found, or an array of arrays with 'teamId', 'channelId', 'frcTeam',
+     * 'subscriptionType' and 'subscribedByUserId'
+     */
     public function getSlackTeamSubscriptions($teamId, $channelId) {
         $stmt = $this->mysqli->prepare("SELECT * FROM slackTeamSubscriptions WHERE teamId = ? AND channelId = ?");
         $stmt->bind_param("ss", $teamId, $channelId);
@@ -305,6 +360,16 @@ class DB
         return $subs;
     }
 
+    /**
+     * Insert or update a subscription.
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $channelId Slack ChannelId
+     * @param int $frcTeam FRC team number
+     * @param string $subscriptionType Subscription type, 'all', 'result' or 'summary'
+     * @param string $userId Slack UserId who requested or updated the subscription
+     * @return bool true on successful insert/update
+     */
     public function setSlackTeamSubscription($teamId, $channelId, $frcTeam, $subscriptionType, $userId) {
         $stmt = $this->mysqli->prepare("INSERT INTO slackTeamSubscriptions (teamId, channelId, frcTeam, "
             . "subscriptionType, subscribedByUserId) VALUES (?, ?, ?, ?, ?) "
@@ -322,6 +387,14 @@ class DB
         return true;
     }
 
+    /**
+     * Delete a subscription to an FRC team.
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $channelId Slack ChannelId
+     * @param int $frcTeam FRC team number
+     * @return bool false on error
+     */
     public function deleteSlackTeamSubscription($teamId, $channelId, $frcTeam) {
         $stmt = $this->mysqli->prepare("DELETE FROM slackTeamSubscriptions WHERE teamId = ? AND channelId = ? "
             . "AND frcTeam = ?");
@@ -337,6 +410,16 @@ class DB
         return true;
     }
 
+    /**
+     * Log a message received by the bot.
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $channelId Slack ChannelId
+     * @param string $sendingUserId Slack UserId who sent the command
+     * @param string $commandString In a DM, the entire message, or in another channel words past the trigger word
+     * interpreted as a command
+     * @return bool false on error
+     */
     public function logMessage($teamId, $channelId, $sendingUserId, $commandString) {
         $stmt = $this->mysqli->prepare("INSERT INTO botMessageLog (teamId, channelId, sendingUserId, commandString) "
             . "VALUES (?, ?, ?, ?)");

@@ -13,32 +13,33 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * TBS Status Object
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba\objects;
 
-
+/**
+ * TBA Status Object.
+ * @author Brian Rozmierski
+ */
 class Status
 {
 
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
     /**
      * Status constructor.
-     * @param $data array returned from status API
+     * @param \stdClass $data returned from status API
      */
-    public function __construct($data)
+    public function __construct(\stdClass $data)
     {
         $this->data = $data;
     }
 
     /**
+     * Gets the current season.
+     *
      * @return int Current Season (year)
      */
     public function getCurrentSeason() {
@@ -46,6 +47,8 @@ class Status
     }
 
     /**
+     * Gets an array of events that are offline.
+     *
      * @return array Array of events that are down
      */
     public function getDownEvents() {
@@ -53,6 +56,8 @@ class Status
     }
 
     /**
+     * Gets the minimum supported IOS version number.
+     *
      * @return int Minimum IOS Version
      */
     public function getIosMinVersion() {
@@ -60,6 +65,8 @@ class Status
     }
 
     /**
+     * Gets the latest IOS version number.
+     *
      * @return int Latest IOS Version
      */
     public function getIosLatestVersion() {
@@ -67,6 +74,8 @@ class Status
     }
 
     /**
+     * Gets the latest season (year) that data is available for.
+     *
      * @return int Latest (max) Season (year)
      */
     public function getMaxSeason() {
@@ -74,6 +83,8 @@ class Status
     }
 
     /**
+     * Gets the minimum supported Android version number.
+     *
      * @return int Minimum Android Version
      */
     public function getAndroidMinVersion() {
@@ -81,6 +92,8 @@ class Status
     }
 
     /**
+     * Gets the latest Android version number.
+     *
      * @return int Latest Android Version
      */
     public function getAndroidLatestVersion() {
@@ -88,7 +101,9 @@ class Status
     }
 
     /**
-     * @return bool true if the FIRST FMS API datafeed is down
+     * Notes if the FIRST FMS API data feed is down.
+     *
+     * @return bool true if the FIRST FMS API data feed is down
      */
     public function isDataFeedDown() {
         return $this->data->is_datafeed_down;

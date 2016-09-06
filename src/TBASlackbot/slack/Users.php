@@ -13,10 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Slack User management and utilities.
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\slack;
 
@@ -26,6 +22,10 @@ use Slack\ApiClient;
 use Slack\User;
 use TBASlackbot\utils\DB;
 
+/**
+ * Slack User management and utilities.
+ * @author Brian Rozmierski
+ */
 class Users
 {
     /**

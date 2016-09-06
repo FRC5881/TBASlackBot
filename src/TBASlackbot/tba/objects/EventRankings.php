@@ -13,14 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace TBASlackbot\tba\objects;
+
 /**
  * Handles the output from the TBA event ranking API and creates an array of EventRanking objects to iterate.
  * @author Brian Rozmierski
  */
-
-namespace TBASlackbot\tba\objects;
-
-
 class EventRankings
 {
     /**
@@ -34,8 +33,9 @@ class EventRankings
     public $rankings = array();
 
     /**
-     * Event Ranking constructor.
-     * @param $data array returned from event ranking API
+     * Event Rankings constructor.
+     *
+     * @param array $data returned from event ranking API
      */
     public function __construct($data)
     {
@@ -49,6 +49,8 @@ class EventRankings
     }
 
     /**
+     * Gets an array of EventRanking objects for this event.
+     *
      * @return EventRanking[]
      */
     public function getRankings() {
@@ -56,15 +58,19 @@ class EventRankings
     }
 
     /**
-     * @return int
+     * Gets the number of teams ranked at this event.
+     *
+     * @return int number of ranked teams
      */
     public function getNumberOfRankedTeams() {
         return count($this->rankings);
     }
 
     /**
-     * @param $team int FRC team number
-     * @return EventRanking|null
+     * Gets the individual ranking for a given team.
+     *
+     * @param int $team team number
+     * @return EventRanking|null Ranking or null if team number not found in ranking
      */
     public function getRankingForTeam($team) {
         foreach ($this->rankings as $ranking) {

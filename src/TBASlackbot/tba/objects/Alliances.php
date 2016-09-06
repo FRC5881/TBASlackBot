@@ -13,60 +13,70 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Alliances object, used by various TBA match and event objects
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba\objects;
 
-
+/**
+ * Alliances object, used by various TBA match and event objects.
+ * @author Brian Rozmierski
+ */
 class Alliances
 {
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
     /**
-     * Event Match constructor.
-     * @param $data array returned from event match API
+     * Alliance constructor.
+     *
+     * @param \stdClass $data returned from event match API
      */
-    public function __construct($data)
+    public function __construct(\stdClass $data)
     {
         $this->data = $data;
     }
 
     /**
-     * @return int
+     * Gets the blue alliance score.
+     *
+     * @return int blue alliance score
      */
     public function getBlueScore() {
         return $this->data->blue->score;
     }
 
     /**
-     * @return array
+     * Gets an array of the blue alliance team numbers.
+     *
+     * @return int[] array of blue team numbers
      */
     public function getBlueTeams() {
         return $this->stripTagFromTeams($this->data->blue->teams);
     }
 
     /**
-     * @return int
+     * Gets the red alliance score.
+     *
+     * @return int red alliance score
      */
     public function getRedScore() {
         return $this->data->red->score;
     }
 
     /**
-     * @return array
+     * Gets an array of the red alliance team numbers.
+     *
+     * @return int[] array of red team numbers
      */
     public function getRedTeams() {
         return $this->stripTagFromTeams($this->data->red->teams);
     }
 
     /**
-     * @param $team
+     * Denotes if a given team is in one of the alliances.
+     *
+     * @param string $team team number as 'frcXXXX'
      * @return bool True if the team number is represented in either red or blue alliance
      */
     public function isTeamInAlliances($team) {
@@ -74,8 +84,10 @@ class Alliances
     }
 
     /**
-     * @param $team
-     * @return null|string red or blue or null if not in match
+     * Gets the alliance a given team is on.
+     *
+     * @param string $team team number as 'frcXXXX'
+     * @return string|null 'red' or 'blue' or null if not in match
      */
     public function getAllianceForTeam($team) {
         if (in_array($team, $this->getRedTeams())) {
@@ -88,8 +100,10 @@ class Alliances
     }
 
     /**
-     * @param $teams array Teams with 'frc' prefix
-     * @return array
+     * Strips the 'frc' prefix from an array of teams.
+     *
+     * @param array $teams Teams with 'frc' prefix
+     * @return int[] array of team w/o 'frc' prefix
      */
     private function stripTagFromTeams($teams) {
         $newTeams = array();

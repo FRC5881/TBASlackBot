@@ -13,13 +13,8 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Processes inbound events/messages from TBA fire hose
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba;
-
 
 use TBASlackbot\tba\objects\Award;
 use TBASlackbot\tba\objects\Event;
@@ -27,8 +22,15 @@ use TBASlackbot\tba\objects\EventMatch;
 use TBASlackbot\tba\objects\webhooks\CompetitionLevelStarting;
 use TBASlackbot\tba\objects\webhooks\UpcomingMatch;
 
+/**
+ * Processes inbound events/messages from TBA fire hose.
+ * @author Brian Rozmierski
+ */
 class ProcessEvent
 {
+    /**
+     * @param string $messageJson
+     */
     public static function processEvent($messageJson) {
         $messageWrapper = json_decode($messageJson);
 
@@ -56,7 +58,7 @@ class ProcessEvent
             case 'ping':
             case 'update_favorites':
             case 'update_subscriptions':
-                // Noop
+                // Nothing to do here, ignore.
                 break;
             case 'broadcast':
             case 'verification':
@@ -67,6 +69,9 @@ class ProcessEvent
         }
     }
 
+    /**
+     * @param UpcomingMatch $upcomingMatch
+     */
     public static function processUpcomingMatch(UpcomingMatch $upcomingMatch) {
 
     }

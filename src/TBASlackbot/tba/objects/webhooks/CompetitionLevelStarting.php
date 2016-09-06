@@ -13,42 +13,62 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace TBASlackbot\tba\objects\webhooks;
+
 /**
  * Object for Competition Level Starting webhook
  * @author Brian Rozmierski
  */
-
-namespace TBASlackbot\tba\objects\webhooks;
-
-
 class CompetitionLevelStarting
 {
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
     /**
      * Competition Level Starting constructor.
-     * @param $data array returned from webhook
+     *
+     * @param \stdClass $data returned from webhook
      */
-    public function __construct($data)
+    public function __construct(\stdClass $data)
     {
         $this->data = $data;
     }
 
+    /**
+     * Gets the Event Name
+     *
+     * @return string|null Event name
+     */
     public function getEventName() {
         return $this->data->event_name;
     }
 
+    /**
+     * Gets the Event Key
+     *
+     * @return string|null Event Key
+     */
     public function getEventKey() {
         return $this->data->event_key;
     }
 
+    /**
+     * Gets the Competition Level
+     *
+     * @return string|null Competition Level code 'f', 'sf', 'qf', 'qm'
+     */
     public function getCompLevel() {
         return $this->data->comp_level;
     }
 
+    /**
+     * Gets the scheduled time for the next match
+     *
+     * @return int|null Scheduled Time as UNIX Epoch
+     */
     public function getScheduledTime() {
         return $this->data->scheduled_time;
     }

@@ -13,50 +13,80 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * TBA Award Object
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba\objects;
 
-
+/**
+ * TBA Award Object.
+ * @author Brian Rozmierski
+ */
 class Award
 {
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
     /**
      * Award constructor.
-     * @param $data array returned from award API
+     *
+     * @param \stdClass $data returned from award API
      */
-    public function __construct($data)
+    public function __construct(\stdClass $data)
     {
         $this->data = $data;
     }
 
+    /**
+     * Gets the name of the award.
+     *
+     * @return string award name
+     */
     public function getName() {
         return $this->data->name;
     }
 
+    /**
+     * Gets the TBA code for the award type
+     *
+     * @return int TBA award type code
+     */
     public function getAwardType() {
+        //TODO Process this to class/enum
         return $this->data->award_type;
     }
 
+    /**
+     * Gets the event key for this award.
+     * @return string event key
+     */
     public function getEventKey() {
         return $this->data->event_key;
     }
 
+    /**
+     * Gets the team number of the winning team.
+     *
+     * @return int|null recipient team number or null if an individual non-team award
+     */
     public function getRecipientTeam() {
         return $this->data->recipiennt_list->team_number;
     }
 
+    /**
+     * Gets the name of the award recipient.
+     *
+     * @return string|null Award recipient name, or null if not an individual award
+     */
     public function getRecipientAwardee() {
         return $this->data->recipiennt_list->awardee;
     }
 
+    /**
+     * Gets the year this award was given.
+     *
+     * @return int Year of the award
+     */
     public function getYear() {
         return $this->data->year;
     }

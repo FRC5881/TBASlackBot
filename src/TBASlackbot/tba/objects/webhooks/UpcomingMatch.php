@@ -13,47 +13,72 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace TBASlackbot\tba\objects\webhooks;
+
 /**
  * UpcomingMatch webhook object.
  * @author Brian Rozmierski
  */
-
-namespace TBASlackbot\tba\objects\webhooks;
-
-
 class UpcomingMatch
 {
     /**
-     * @var array
+     * @var \stdClass
      */
     public $data;
 
     /**
      * Upcoming Match constructor.
-     * @param $data array returned from webhook
+     *
+     * @param \stdClass $data returned from webhook
      */
-    public function __construct($data)
+    public function __construct(\stdClass $data)
     {
         $this->data = $data;
     }
 
+    /**
+     * Gets the Event Name.
+     *
+     * @return string|null Event Name
+     */
     public function getEventName() {
-        $this->data->event_name;
+        return $this->data->event_name;
     }
 
+    /**
+     * Gets the scheduled time for the match.
+     *
+     * @return int|null Scheduled time for match as UNIX Epoch
+     */
     public function getScheduledTime() {
-        $this->data->scheduled_time;
+        return $this->data->scheduled_time;
     }
 
+    /**
+     * Gets the Match Key.
+     *
+     * @return string|null Match Key
+     */
     public function getMatchKey() {
-        $this->data->match_key;
+        return $this->data->match_key;
     }
 
+    /**
+     * Gets the Team Keys.
+     *
+     * @return string[]|null Array of team keys (frcXXXX) in the match
+     */
     public function getTeamKeys() {
-        $this->data->team_keys;
+        return $this->data->team_keys;
     }
 
+    /**
+     * Gets the TBA predicted start time of the match
+     *
+     * @return int|null Predicted start time as UNIX Epoch
+     */
     public function getPredictedTime() {
-        $this->data->predicted_time;
+        return $this->data->predicted_time;
     }
 }

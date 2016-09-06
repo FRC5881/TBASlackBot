@@ -13,31 +13,31 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace TBASlackbot\tba\objects;
+
 /**
  * Holds a single Event Ranking from the TBA API.
  * This seems to vary dramatically from year to year, so only basics are listed.
  * @author Brian Rozmierski
  */
-
-namespace TBASlackbot\tba\objects;
-
-
 class EventRanking
 {
     /**
-     * @var array
+     * @var string[]
      */
     public $header;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     public $data;
 
     /**
      * Event Ranking constructor.
-     * @param $header array
-     * @param $data array returned from event ranking API
+     *
+     * @param string[] $header header values from the event ranking API
+     * @param mixed[] $data returned from event ranking API
      */
     public function __construct($header, $data)
     {
@@ -45,23 +45,37 @@ class EventRanking
         $this->data = $data;
     }
 
+    /**
+     * Gets the rank of the team at the event.
+     *
+     * @return int rank position
+     */
     public function getRank() {
         return $this->data[0];
     }
 
+    /**
+     * Gets the team number at this rank.
+     *
+     * @return int team number
+     */
     public function getTeam() {
         return $this->data[1];
     }
 
     /**
-     * @return bool
+     * Notes if the W-L-T record through qualifications is available.
+     *
+     * @return bool true if record is available
      */
     public function isRecordAvailable() {
         return $this->getOther("Record (W-L-T)") != null;
     }
 
     /**
-     * @return null|string
+     * Gets the number of wins through qualifications.
+     *
+     * @return null|int wins or null if not available
      */
     public function getWins() {
         if ($this->getOther("Record (W-L-T)") != null) {
@@ -72,7 +86,9 @@ class EventRanking
     }
 
     /**
-     * @return null|string
+     * Gets the number of losses through qualifications.
+     *
+     * @return null|int losses or null if not available
      */
     public function getLosses() {
         if ($this->getOther("Record (W-L-T)") != null) {
@@ -85,7 +101,9 @@ class EventRanking
     }
 
     /**
-     * @return null|string
+     * Gets the number of ties through qualifications.
+     *
+     * @return null|int ties or null if not available
      */
     public function getTies() {
         if ($this->getOther("Record (W-L-T)") != null) {
@@ -96,7 +114,7 @@ class EventRanking
     }
 
     /**
-     * @param $name string Header value to lookup
+     * @param string $name Header value to lookup
      * @return mixed|null
      */
     public function getOther($name) {

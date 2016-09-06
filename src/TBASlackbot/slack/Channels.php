@@ -13,10 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Channel Management and Utils.
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\slack;
 
@@ -28,6 +24,10 @@ use Slack\DirectMessageChannel;
 use Slack\Group;
 use TBASlackbot\utils\DB;
 
+/**
+ * Channel Management and Utils.
+ * @author Brian Rozmierski
+ */
 class Channels
 {
 

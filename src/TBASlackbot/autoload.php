@@ -14,7 +14,7 @@
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Loads all TBASlackbot classes
+ * Loads all TBASlackbot classes.
  * @author Brian Rozmierski
  */
 

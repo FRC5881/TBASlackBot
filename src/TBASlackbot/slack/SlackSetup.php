@@ -13,10 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Responsible for app setup and welcome to the installing user.
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\slack;
 
@@ -27,6 +23,10 @@ use Slack\DirectMessageChannel;
 use Slack\User;
 use TBASlackbot\utils\DB;
 
+/**
+ * Responsible for app setup and welcome to the installing user.
+ * @author Brian Rozmierski
+ */
 class SlackSetup
 {
 

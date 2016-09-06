@@ -52,7 +52,7 @@ if (!defined('TBASLACKBOT')) {
     define('TBASLACKBOT_SLACK_CLIENT_ID', 'GET THIS FROM THE SLACK APP MANAGEMENT PAGE');
 
     /**
-     * Slack OAuth / Slck App Client Secret -- THIS MUST NOT BE MADE PUBLIC
+     * Slack OAuth / Slack App Client Secret -- THIS MUST NOT BE MADE PUBLIC
      */
     define('TBASLACKBOT_SLACK_CLIENT_SECRET', 'GET THIS FROM THE SLACK APP MANAGEMENT PAGE');
 

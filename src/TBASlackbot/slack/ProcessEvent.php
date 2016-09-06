@@ -13,14 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace TBASlackbot\slack;
+
 /**
  * Handles inbound events from the Slack Event API and sends them on for further processing.
  * @author Brian Rozmierski
  */
-
-namespace TBASlackbot\slack;
-
-
 class ProcessEvent
 {
     /**

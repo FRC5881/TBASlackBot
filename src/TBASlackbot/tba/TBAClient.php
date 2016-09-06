@@ -13,10 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Client for The Blue Alliance
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\tba;
 
@@ -31,6 +27,10 @@ use TBASlackbot\tba\objects\Status;
 use TBASlackbot\tba\objects\Team;
 use TBASlackbot\utils\DB;
 
+/**
+ * Client for The Blue Alliance API v2.
+ * @author Brian Rozmierski
+ */
 class TBAClient
 {
     private static $URLBASE = "https://www.thebluealliance.com/api/v2/";
@@ -47,7 +47,8 @@ class TBAClient
 
     /**
      * TBAClient constructor.
-     * @param $appId string The Blue Alliance X-TBA-App-Id element
+     *
+     * @param string $appId The Blue Alliance X-TBA-App-Id element
      * @link https://www.thebluealliance.com/apidocs
      */
     public function __construct($appId)
@@ -57,6 +58,8 @@ class TBAClient
     }
 
     /**
+     * Gets the TBA Status result. Cached for 10 minutes.
+     *
      * @return null|Status
      */
     public function getTBAStatus() {
@@ -78,8 +81,10 @@ class TBAClient
     }
 
     /**
-     * @param $teamId
-     * @return null|Team
+     * Lookup an FRC team.
+     *
+     * @param string $teamId Team key as 'frcXXXX'
+     * @return null|Team null on error, or Team object
      */
     public function getTeam($teamId) {
         $team = $this->callApi("team/$teamId");
@@ -100,9 +105,11 @@ class TBAClient
     }
 
     /**
-     * @param $teamId
-     * @param $year
-     * @return Event[]
+     * Get the events for a given team in a given year.
+     *
+     * @param string $teamId Team key as 'frcXXXX'
+     * @param int $year Year to look for events for
+     * @return Event[]|null null on error or Array of Event objects, may be empty
      */
     public function getTeamEvents($teamId, $year) {
         $events = $this->callApi("team/$teamId/$year/events");
@@ -130,9 +137,11 @@ class TBAClient
     }
 
     /**
-     * @param $teamId
-     * @param $eventCode
-     * @return Award[]|null
+     * Get awards for a team at an event.
+     *
+     * @param string $teamId Team key as 'frcXXXX'
+     * @param string $eventCode Event code
+     * @return Award[]|null null on error, or array of Award objects, may be empty
      */
     public function getTeamEventAwards($teamId, $eventCode) {
         $awards = $this->callApi("team/$teamId/event/$eventCode/awards");
@@ -158,7 +167,9 @@ class TBAClient
     }
 
     /**
-     * @param $teamId
+     * Gets the team district history, showing each year and what, if any, district the team was in.
+     *
+     * @param string $teamId Team key as 'frcXXXX'
      * @return null|array index array with season year and district code
      */
     public function getTeamHistoryDistricts($teamId) {
@@ -180,8 +191,10 @@ class TBAClient
     }
 
     /**
-     * @param $eventId
-     * @return null|Event
+     * Gets a specific event.
+     *
+     * @param string $eventId Event code
+     * @return null|Event null on error, or Event object
      */
     public function getEvent($eventId) {
         $event = $this->callApi("event/$eventId");
@@ -202,8 +215,10 @@ class TBAClient
     }
 
     /**
-     * @param $eventId
-     * @return null|EventMatches
+     * Gets matches for a specific event.
+     *
+     * @param string $eventId Event code
+     * @return null|EventMatches null on error or EventMatches object
      */
     public function getEventMatches($eventId) {
         $matches = $this->callApi("event/$eventId/matches");
@@ -224,8 +239,10 @@ class TBAClient
     }
 
     /**
-     * @param $eventId
-     * @return null|EventRankings
+     * Gets rankings for a specific event.
+     *
+     * @param string $eventId Event code
+     * @return null|EventRankings null on error or EventRankings object
      */
     public function getEventRankings($eventId) {
         $rankings = $this->callApi("event/$eventId/rankings");
@@ -246,8 +263,10 @@ class TBAClient
     }
 
     /**
-     * @param $year
-     * @return null|District[]
+     * Get a list of districts valid for a given year.
+     *
+     * @param int $year Year
+     * @return null|District[] null on error or array of District objects
      */
     public function getDistricts($year) {
         $districts = $this->callApi("districts/$year");
@@ -275,6 +294,7 @@ class TBAClient
     /**
      * Calls the TBA API for that stub URL, checking the cache first, and using the If-Modified-Since header to
      * be a nice TBA API user.
+     *
      * @param $urlStub string The URL stub from the API to call eg 'team/frc5881'
      * @param int $minCacheTime int Optional minimum amount of time to use a cache object exclusively for. If the
      * cached object is not at least this number of seconds old, no API call will be made to TBA, and the cached

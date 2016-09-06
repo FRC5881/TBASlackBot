@@ -14,7 +14,7 @@
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Handles intake and responses for the TBA Firehose
+ * Handles intake and responses for the TBA Fire hose.
  * @author Brian Rozmierski
  */
 

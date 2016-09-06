@@ -13,10 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Handles inbound messages from Slack users
- * @author Brian Rozmierski
- */
 
 namespace TBASlackbot\slack;
 
@@ -27,8 +23,21 @@ use Slack\Message\Attachment;
 use TBASlackbot\tba\TBAClient;
 use TBASlackbot\utils\DB;
 
+/**
+ * Handles inbound messages from Slack users.
+ * @author Brian Rozmierski
+ */
 class ProcessMessage
 {
+    /**
+     * Process an inbound message from Slack. Do basic checking and filtering before handing off to 
+     * channel-specific handlers.
+     * 
+     * @param string $teamId Slack TeamId
+     * @param string $sendingUser Slack UserId of sending user
+     * @param string $messageText Text of message from Slack User
+     * @param string $channelId Slack ChannelId the message came in on
+     */
     public static function process($teamId, $sendingUser, $messageText, $channelId) {
         // Message processing is split between 2 general types based on the channel it's received on.
         // First, messages on a direct message / im channel are processed in full as commands.
@@ -59,6 +68,14 @@ class ProcessMessage
         }
     }
 
+    /**
+     * Handle a direct message, where no trigger word/name is required.
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $sendingUser Slack UserId of sending user
+     * @param string $messageText Text of message from Slack User
+     * @param array $channelCache Channel cache for the received channel
+     */
     private static function processDirectMessage($teamId, $sendingUser, $messageText, $channelCache) {
         // This is the simplest processing required... Messages are parsed for command words and parameters
         $messageText = trim($messageText);
@@ -74,6 +91,14 @@ class ProcessMessage
         self::commandRouter($teamId, $channelCache, $wordArray, 0, $sendingUser, false);
     }
 
+    /**
+     * Handle a message received in a multiparty channel, listen for the bot's name and then process the command
+     * 
+     * @param string $teamId Slack TeamId
+     * @param string $sendingUser Slack UserId of sending user
+     * @param string $messageText Text of message from Slack User
+     * @param array $channelCache Channel cache for the received channel
+     */
     private static function processConversationalMessage($teamId, $sendingUser, $messageText, $channelCache) {
         // So basically we have to look for messages that have our botUserId string in them... Oh joy.
 
@@ -106,12 +131,12 @@ class ProcessMessage
     }
 
     /**
-     * @param $teamId string Slack TeamId
-     * @param $channelCache array Channel Cache as stored by the DB
-     * @param $wordArray string[] Words in the inbound message.
-     * @param $startWord int array index to start command processing at
-     * @param $messageFrom string Slach UserId that sent the triggered message
-     * @param $sendAsReply bool true if reply message should be directed to the user, or false for sent plain
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param string[] $wordArray Words in the inbound message.
+     * @param int $startWord array index to start command processing at
+     * @param string $messageFrom Slack UserId that sent the triggered message
+     * @param bool $sendAsReply true if reply message should be directed to the user, or false for sent plain
      */
     private static function commandRouter($teamId, $channelCache, $wordArray, $startWord, $messageFrom, $sendAsReply) {
         $wordArray = array_map('strtolower', $wordArray);
@@ -210,6 +235,12 @@ class ProcessMessage
         }
     }
 
+    /**
+     * Perform a basic sanity check on the team number given.
+     * 
+     * @param mixed $teamNumber Team number, without 'frc' prefix
+     * @return bool|int false on invalid, or team number on valid
+     */
     private static function validateTeamNumber($teamNumber) {
         if (is_numeric($teamNumber) && $teamNumber > 0 && $teamNumber < 9999) {
             return (int) $teamNumber;
@@ -218,15 +249,37 @@ class ProcessMessage
         return false;
     }
 
+    /**
+     * Send a message to the user that the command requested was unknown.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function sendUnknownCommand($teamId, $channelCache, $replyTo = null) {
         self::sendReply($teamId, $channelCache, "I'm sorry, but I'm not fully sentient yet and get confused easily. "
             . "Perhaps asking for *_help_* would be useful?", $replyTo);
     }
 
+    /**
+     * Reply to the user that we could not find the team they asked for.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function sendUnknownTeam($teamId, $channelCache, $replyTo = null) {
         self::sendReply($teamId, $channelCache, "I'm sorry, but I can't find any record of that team.", $replyTo);
     }
 
+    /**
+     * Send to the user a help message, optionally detailed by the command/group the user wishes help with.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param string $helpCommand Command/group user wants more specific help with, may be null or invalid
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function helpRouter($teamId, $channelCache, $helpCommand, $replyTo = null) {
         if ($helpCommand) {
             switch($helpCommand) {
@@ -309,6 +362,13 @@ class ProcessMessage
         }
     }
 
+    /**
+     * Send the user the basic help message.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function sendHelpAttachment($teamId, $channelCache, $replyTo = null) {
         /**
          * @var Attachment[]
@@ -348,6 +408,14 @@ class ProcessMessage
             . "to be mentioned first.\n", $replyTo, $attachments);
     }
 
+    /**
+     * Send the user basic info on a team.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param int $teamInfoRequestedFor FRC team number
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function processShortRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
         $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
 
@@ -368,6 +436,14 @@ class ProcessMessage
             . ($district == null ? '' : " in the " . $district->getName() . " region."), $replyTo);
     }
 
+    /**
+     * Send the user slightly more detailed info on a team.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param int $teamInfoRequestedFor FRC team number
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function processInfoRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
         $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
 
@@ -393,6 +469,14 @@ class ProcessMessage
                 . '-' . $record['ties'] . " across " . $record['competitions'] . " events."), $replyTo);
     }
 
+    /**
+     * A/B testing output from processInfoRequest
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param int $teamInfoRequestedFor FRC team number
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function processBetaInfoRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
         $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
 
@@ -420,6 +504,14 @@ class ProcessMessage
             $replyTo);
     }
 
+    /**
+     * Send the user detailed information on a team.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param int $teamInfoRequestedFor FRC team number
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function processDetailRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
         $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
 
@@ -490,6 +582,14 @@ class ProcessMessage
             $attachments);
     }
 
+    /**
+     * Send the user competition status information on a team.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param int $teamStatusRequestedFor FRC team number
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function processStatusRequest($teamId, $channelCache, $teamStatusRequestedFor, $replyTo = null) {
         // First, check to see if the team is currently playing in any events, and report rank and last/next match
         // If not, check for any upcoming events, and report on their next event start date.
@@ -567,6 +667,16 @@ class ProcessMessage
         self::sendReply($teamId, $channelCache, $output, $replyTo);
     }
 
+    /**
+     * Subscribe a channel to updates from an FRC team at competition.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param int $teamStatusRequestedFor FRC team number
+     * @param string $level Subscription level, 'all', 'result' or 'summary' only
+     * @param string $requestedBy Slack UserId that requested the subscription
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function processFollowRequest($teamId, $channelCache, $teamStatusRequestedFor, $level = 'all',
                                                  $requestedBy, $replyTo = null) {
         if ($level !='all' && $level != 'result' && $level != 'summary') {
@@ -600,6 +710,14 @@ class ProcessMessage
             . "To stop, just ask me to *_unfollow " . $team->getTeamNumber() . "_* from this channel.", $replyTo);
     }
 
+    /**
+     * Unsubscribe a channel to an FRC team's competition updates.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param int $teamStatusRequestedFor FRC team number
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function processUnfollowRequest($teamId, $channelCache, $teamStatusRequestedFor, $replyTo = null) {
         $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
         $db = new DB();
@@ -621,6 +739,13 @@ class ProcessMessage
         }
     }
 
+    /**
+     * List the teams currently being followed in the channel.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
     private static function processFollowingRequest($teamId, $channelCache, $replyTo = null) {
         $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
         $db = new DB();
@@ -652,8 +777,10 @@ class ProcessMessage
     }
 
     /**
-     * @param $teamId string Slack TeamId
-     * @param $channelCache array DB Channel Cache to send the message on
+     * Helper function to do the heavy listing and actually send replies.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
      * @param $reply string Message to send
      * @param $replyTo string Slack UserId to reply to
      * @param null|Attachment[] $attachments

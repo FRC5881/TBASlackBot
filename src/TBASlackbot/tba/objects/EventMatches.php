@@ -13,14 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License along with this
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace TBASlackbot\tba\objects;
+
 /**
  * Handles the output from the TBA event matches API
  * @author Brian Rozmierski
  */
-
-namespace TBASlackbot\tba\objects;
-
-
 class EventMatches
 {
     /**
@@ -35,6 +34,7 @@ class EventMatches
 
     /**
      * Event Matches constructor.
+     *
      * @param $data array returned from event matches API
      */
     public function __construct($data)
@@ -105,7 +105,7 @@ class EventMatches
     }
 
     /**
-     * @param $team
+     * @param string $team Team code as frcXXXX
      * @return EventMatch[]
      */
     public function getMatchesForTeam($team) {
