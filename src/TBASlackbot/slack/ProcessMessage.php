@@ -343,7 +343,9 @@ class ProcessMessage
                         . 'also mercilessly squashed - some events w/o a short name would be listed as blanks, all '
                         . 'rankings are now event-wide, not just qualification-only, and TBABot now ignores '
                         . 'Slackbot\'s DMs when team-wide announcements are made. (Let\'s not not a bot war, now '
-                        . 'shall we?)');
+                        . 'shall we?) *Late Addition:* Several team\'s URLs are reported by FIRST/TBA to contain '
+                        . 'an extra / character before the address, which breaks the Slack parser and makes things '
+                        . 'ugly. It\'s fixed as of about 10AM Eastern.');
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
 

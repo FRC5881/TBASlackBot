@@ -56,6 +56,8 @@ class Team
     public function getWebsite() {
         if ($this->data->website === "http://www.firstinspires.org/") {
             return null;
+        } else if (strpos($this->data->website, ':///') > 0) {
+            return str_replace(':///', '://', $this->data->website);
         } else {
             return $this->data->website;
         }
