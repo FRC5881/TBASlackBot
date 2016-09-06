@@ -14,7 +14,7 @@
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Handles inbound events from teh Slack Event API and sends them on for further processing.
+ * Handles inbound events from the Slack Event API and sends them on for further processing.
  * @author Brian Rozmierski
  */
 
@@ -24,7 +24,9 @@ namespace TBASlackbot\slack;
 class ProcessEvent
 {
     /**
-     * @param $eventJson String The raw JASON-encoded string from the event api
+     * Process the given JSON string Slack Event.
+     *
+     * @param String $eventJson The raw JASON-encoded string from the Slack Event API
      */
     public static function processEvent($eventJson) {
         $eventWrapper = json_decode($eventJson);

@@ -31,13 +31,17 @@ use TBASlackbot\utils\DB;
 class Channels
 {
 
+    /**
+     * @var int Maximum amount of time, in seconds, to use the cached Slack channel information.
+     */
     private static $MAX_AGE = 2 * 24 * 26 * 60; // 2 days in seconds
 
     /**
-     * Gets the cached slack channel info, or if not previously cached (or out of date), refreshes it.
-     * @param $teamId String Slack team id
-     * @param $channelId String Slack channel id
-     * @return array cached channel information
+     * Gets the cached Slack channel info, or if not previously cached (or out of date), refreshes it.
+     *
+     * @param String $teamId Slack team id
+     * @param String $channelId Slack channel id
+     * @return array cached channel information, array fields are named per the MySQL slackChannelCache table
      */
     public static function getChannelCache($teamId, $channelId) {
         $db = new DB();
@@ -84,19 +88,24 @@ class Channels
     }
 
     /**
-     * @param $channelCache
-     * @param ApiClient $client
-     * @return null|Channel|DirectMessageChannel|Group
+     * Creates a ChannelInterface-type object suitable for use in the Slack API library.
+     *
+     * @param array $channelCache Array matching output from the slackChannelCache MySQL table
+     * @param ApiClient $client Initialized Slack ApiClient object
+     * @return null|Channel|DirectMessageChannel|Group Null returned for null ChannelCache or a mismatched
+     * channelType, otherwise appropriate Channel object is returned to match
      */
     public static function getChannelInterfaceFromCache($channelCache, ApiClient $client) {
-        switch ($channelCache['channelType']) {
-            case "channel": // Standard channel
-                return new Channel($client, array('id' => $channelCache['channelId']));
-            case "im": // IM channel
-                return new DirectMessageChannel($client, array('id' => $channelCache['channelId']));
-            case "mpim": // Group OR mpim channel
-            case "group":
-                return new Group($client, array('id' => $channelCache['channelId']));
+        if ($channelCache) {
+            switch ($channelCache['channelType']) {
+                case "channel": // Standard channel
+                    return new Channel($client, array('id' => $channelCache['channelId']));
+                case "im": // IM channel
+                    return new DirectMessageChannel($client, array('id' => $channelCache['channelId']));
+                case "mpim": // Group OR mpim channel
+                case "group":
+                    return new Group($client, array('id' => $channelCache['channelId']));
+            }
         }
 
         return null;

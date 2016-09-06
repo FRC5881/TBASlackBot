@@ -97,7 +97,8 @@ class ProcessMessage
             if (count($wordArray) == $startWord) {
                 // Nothing was said after @tbabot
                 $db->logMessage($teamId, $channelCache['channelId'], $sendingUser, "@tbabot");
-                self::sendReply($teamId, $channelCache, "Did someone say something? I thought I heard my name....", null);
+                self::sendReply($teamId, $channelCache,
+                    "Did someone say something? I thought I heard my name....", null);
             }
 
             self::commandRouter($teamId, $channelCache, $wordArray, $startWord, $sendingUser, true);
@@ -656,7 +657,6 @@ class ProcessMessage
      * @param $reply string Message to send
      * @param $replyTo string Slack UserId to reply to
      * @param null|Attachment[] $attachments
-     * @return mixed
      */
     private static function sendReply($teamId, $channelCache, $reply, $replyTo, $attachments = null) {
         $db = new DB();

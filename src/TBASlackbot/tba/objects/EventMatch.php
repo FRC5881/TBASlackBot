@@ -189,6 +189,8 @@ class EventMatch
             // It went to the tossup, and we don't know how FMS decided.
             return null;
         }
+
+        return null;
     }
 
     /**

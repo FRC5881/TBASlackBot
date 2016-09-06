@@ -28,8 +28,19 @@ use TBASlackbot\utils\DB;
 
 class Users
 {
+    /**
+     * @var int Maximum amount of time, in seconds, to use the cached Slack user information.
+     */
     private static $MAX_AGE = 2 * 24 * 26 * 60; // 2 days in seconds
 
+    /**
+     * Gets a cached user object for the given user on the given team. Result is the cached object, but if the existing
+     * cached object has expired, a call the the Slack API will be made to refresh.
+     *
+     * @param String $teamId Slack TeamId
+     * @param String $userId Slack UserId
+     * @return array Array fields match the columns of the slackUserCache table
+     */
     public static function getUserCache($teamId, $userId) {
         $db = new DB();
 

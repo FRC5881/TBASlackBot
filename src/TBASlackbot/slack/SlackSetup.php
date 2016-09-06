@@ -31,33 +31,35 @@ class SlackSetup
 {
 
     /**
-     * @var string
+     * @var string Slack TeamId
      */
     private $teamId;
 
     /**
-     * @var DB
+     * @var DB Initialized DB Object
      */
     private $db;
 
     /**
-     * @var array
+     * @var array In the form matching the slackOAuth MySQL table
      */
     private $oauth;
 
     /**
-     * @var User
+     * @var User Slack User object representing the User who installed the app
      */
     private $setupUser;
 
     /**
-     * @var User
+     * @var User Slack User object representing the Bot user
      */
     private $botUser;
 
     /**
-     * SlackSetup constructor.
-     * @param $teamId string Slack team ID to setup
+     * Create a SlackSetup object for a given Slack Team and perform the initial setup, including creating OAuth cache
+     *records, channel cache records, and sending the bot welcome message.
+     *
+     * @param string $teamId Slack team ID to setup
      */
     public function __construct($teamId)
     {
@@ -80,6 +82,9 @@ class SlackSetup
         }
     }
 
+    /**
+     * Calls the Slack API as the application to get the User object who installed the application.
+     */
     private function getSetupUser() {
         $loop = Factory::create();
         $client = new ApiClient($loop);
@@ -92,6 +97,9 @@ class SlackSetup
         $loop->run();
     }
 
+    /**
+     * Calls the Slack API as the bot to get the User object for the bot.
+     */
     private function getBotUser() {
         $loop = Factory::create();
         $client = new ApiClient($loop);
@@ -104,6 +112,10 @@ class SlackSetup
         $loop->run();
     }
 
+    /**
+     * Sets up the DM channel between the installing user and the bot, adds caches, sends the welcome, and updates the
+     * OAuth record accordingly.
+     */
     private function setupPrivateChannel() {
         $loop = Factory::create();
         $client = new ApiClient($loop);

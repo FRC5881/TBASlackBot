@@ -14,7 +14,7 @@
 // program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Database Helper Class
+ * Database Interface class. All database interactions should be done through this class.
  * @author Brian Rozmierski
  */
 
@@ -26,7 +26,7 @@ class DB
     private $mysqli;
 
     /**
-     * DB constructor. Inherits values from the settings.php file
+     * DB constructor. Inherits values from the settings.php file.
      */
     public function __construct()
     {
@@ -41,10 +41,11 @@ class DB
 
     /**
      * DB constructor.
-     * @param $host String MySQL hostname
-     * @param $user String MySQL Username
-     * @param $password String MySQL password
-     * @param $dbName String MySQL database name
+     *
+     * @param String $host MySQL hostname
+     * @param String $user MySQL Username
+     * @param String $password MySQL password
+     * @param String $dbName MySQL database name
      */
     public function __construct1($host, $user, $password, $dbName)
     {
@@ -84,7 +85,8 @@ class DB
 
     /**
      * Gets the OAuth record for a given team ID.
-     * @param $teamId String Slack team ID
+     *
+     * @param String $teamId Slack team ID
      * @return array with fields named the same as the setter's parameters
      */
     public function getSlackTeamOAuth($teamId) {
@@ -100,12 +102,13 @@ class DB
 
     /**
      * Sets an OAuth record for a team, can also be called to update a record.
-     * @param $teamId
-     * @param $accessToken
-     * @param $scope
-     * @param $teamName
-     * @param $botUserId
-     * @param $botAccessToken
+     *
+     * @param String $teamId Slack TeamId
+     * @param String $accessToken Slack App access token
+     * @param String $scope OAuth scope granted for the app token
+     * @param String $teamName Slack team name
+     * @param String $botUserId Slack bot UserId
+     * @param String $botAccessToken Bot Slack access token
      * @return bool true on successful insert/update
      */
     public function setSlackTeamOAuth($teamId, $accessToken, $scope, $teamName, $botUserId, $botAccessToken) {
@@ -125,6 +128,13 @@ class DB
         return true;
     }
 
+    /**
+     * Adds the UserId of the user who authorized the app installation to the slackOAuth table.
+     *
+     * @param String $teamId Slack TeamId
+     * @param String $addedByUserId Slack UserId that added the application
+     * @return bool true on successful update
+     */
     public function setSlackTeamOAuthAddedByUser($teamId, $addedByUserId) {
         $stmt = $this->mysqli->prepare("UPDATE slackOAuth SET addedByUserId = ? WHERE teamId = ?");
         $stmt->bind_param('ss', $addedByUserId, $teamId);
@@ -141,7 +151,8 @@ class DB
 
     /**
      * Gets the cached Slack Channel info for the given ID.
-     * @param $channelId String Slack channel ID
+     *
+     * @param String $channelId Slack channel ID
      * @return array with fields named the same as the setter's parameters
      */
     public function getSlackChannelCache($channelId) {
@@ -156,12 +167,14 @@ class DB
     }
 
     /**
-     * @param $teamId
-     * @param $channelId
-     * @param $channelName
-     * @param $channelType
-     * @param $joined
-     * @return bool
+     * Insert or update the Slack channel cache.
+     *
+     * @param String $teamId Slack TeamId
+     * @param String $channelId Slack ChannelId
+     * @param String $channelName Slack channel name
+     * @param String $channelType Channel type matching enum on the channelType field on the slackChannelCache table
+     * @param bool $joined true if the bot user is joined to the channel
+     * @return bool true on successful insert/update
      */
     public function setSlackChannelCache($teamId, $channelId, $channelName, $channelType, $joined) {
         $stmt = $this->mysqli->prepare("INSERT INTO slackChannelCache (teamId, channelId, lastAccess, channelName, "
