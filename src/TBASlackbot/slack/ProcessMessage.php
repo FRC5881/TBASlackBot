@@ -39,15 +39,17 @@ class ProcessMessage
 
         $oauth = $db->getSlackTeamOAuth($teamId);
 
-        if ($oauth['botUserId'] === $sendingUser)
+        // Don't listen to ourselves, or Slackbot. Slackbot will sometimes get chatty about team notifications in
+        // a DM channel.
+        if ($oauth['botUserId'] === $sendingUser || 'USLACKBOT' === $sendingUser) {
             return;
+        }
 
-        //$channelCache = $db->getSlackChannelCache($channelId);
         $channelCache = Channels::getChannelCache($teamId, $channelId);
 
         if ($channelCache == null) {
-            // Oh shit
-            error_log("Null channelcache, running....");
+            error_log("Null ChannelCache for ChannelId $channelId, Aborting message");
+            return;
         }
 
         if ($channelCache['channelType'] === 'im') {
