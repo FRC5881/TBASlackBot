@@ -136,6 +136,16 @@ class ProcessMessage
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
                 }
                 break;
+            case 'betainfo':
+                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "info"
+                    . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
+                if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
+                    self::processBetaInfoRequest($teamId, $channelCache,
+                        self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                } else {
+                    self::sendUnknownCommand($teamId, $channelCache, $replyTo);
+                }
+                break;
             case 'detail':
             case 'details':
                 (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "details"
@@ -272,6 +282,17 @@ class ProcessMessage
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
+                    $attachment =  new Attachment('Improvements & Feedback Requested - Sept 6, 2016',
+                        '*_detail_* now links the event title to the TBA Event page for further analysis. A new info '
+                        . 'style update is available for testing, and your feedback is requested. Try '
+                        . '*_betainfo [team number]_* and let us know which you prefer.' . "\n" . 'Some bugs were '
+                        . 'also mercilessly squashed - some events w/o a short name would be listed as blanks, all '
+                        . 'rankings are now event-wide, not just qualification-only, and TBABot now ignores '
+                        . 'Slackbot\'s DMs when team-wide announcements are made. (Let\'s not not a bot war, now '
+                        . 'shall we?)');
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
                     $attachment =  new Attachment('Command Changes - Sept 5, 2016', 'Changes have been made to the '
                         . '*_info_* command such that it now has additional information. Also, sending a team number '
                         . 'in place of a command will now return the short info form that *_info_* used to provide');
@@ -371,6 +392,33 @@ class ProcessMessage
                 . '-' . $record['ties'] . " across " . $record['competitions'] . " events."), $replyTo);
     }
 
+    private static function processBetaInfoRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
+        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+
+        $teamInfoRequestedFor = 'frc' . $teamInfoRequestedFor;
+
+        $team = $tba->getTeam($teamInfoRequestedFor);
+
+        if ($team == null) {
+            self::sendUnknownTeam($teamId, $channelCache);
+            return;
+        }
+
+        $status = $tba->getTBAStatus();
+        $district = $team->getDistrict($status->getCurrentSeason());
+        $record = $team->getTeamRecord($status->getCurrentSeason());
+
+        self::sendReply($teamId, $channelCache, "Team " . $team->getTeamNumber() . ", "
+            . ($team->getWebsite() == null ? '' : '<' . $team->getWebsite() . '|') . $team->getNickname()
+            . ($team->getWebsite() == null ? '' : '>') . " • " . $team->getLocation() . "\n"
+            . ($team->getRookieYear() == null ? '' : 'Since ' . $team->getRookieYear())
+            . ($district == null ? '' : " • " . $district->getName() . " District")
+            . ($record == null ? '' : " • " . $record['wins'] . '-' . $record['losses']
+                . '-' . $record['ties'] . ", (" . $record['competitions'] . ') ' . $status->getCurrentSeason()
+                . " Events") . ' • ' . '<https://thebluealliance.com/team/' . $team->getTeamNumber() . '|View on TBA>',
+            $replyTo);
+    }
+
     private static function processDetailRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
         $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
 
@@ -420,6 +468,7 @@ class ProcessMessage
                 $attachment = new Attachment($event->getName() . ($event->isOfficial() ? '' : ' (Unofficial)'),
                     $eventText);
 
+                $attachment->data['title_link'] = "https://www.thebluealliance.com/event/" . $event->getKey();
                 $attachment->data['footer'] = $event->getLocation() . " on " . $event->getStartDate() . " to "
                     . $event->getEndDate();
 
