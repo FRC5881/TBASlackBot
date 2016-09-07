@@ -154,6 +154,7 @@ class ProcessMessage
                 self::helpRouter($teamId, $channelCache, $helpCommand, $replyTo);
                 break;
             case 'info':
+            case 'betainfo':
                 (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "info"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
@@ -161,18 +162,6 @@ class ProcessMessage
                         self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
                 } else if ($wordArray[$startWord+1]) {
                     self::sendInvalidTeamNumber($teamId, $channelCache, 'info', $replyTo);
-                } else {
-                    self::sendUnknownCommand($teamId, $channelCache, $replyTo);
-                }
-                break;
-            case 'betainfo':
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "info"
-                    . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
-                if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
-                    self::processBetaInfoRequest($teamId, $channelCache,
-                        self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
-                } else if ($wordArray[$startWord+1]) {
-                    self::sendInvalidTeamNumber($teamId, $channelCache, 'betainfo', $replyTo);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
                 }
@@ -392,11 +381,14 @@ class ProcessMessage
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
-                    $attachment =  new Attachment('Personality Matrix - Sept 7, 2016',
+                    $attachment =  new Attachment('Personality Matrix / info and detail Changes - Sept 7, 2016',
                         'On the good news front, tbabot now has a bit more personality when giving error messages. '
                         . 'There\'s even some rare error messages that have a _very_ low chance of appearing. On '
                         . 'the bad news front, the easter eggs have been temporarily disabled, so you can stop '
-                        . 'flooding the bot with requests for the chute door. (No that wasn\'t one of them.)');
+                        . 'flooding the bot with requests for the chute door. (No that wasn\'t one of them.)' . "\n"
+                        . 'Thanks for the feedback, as a result changes have been made to the *_info_* and '
+                        . '*_detail_* commands to make the output a bit cleaner. A link to the team TBA page '
+                        . 'has also been added to the detail output.');
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
 
@@ -407,24 +399,6 @@ class ProcessMessage
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
 
-                    $attachment =  new Attachment('Improvements & Feedback Requested - Sept 6, 2016',
-                        '*_detail_* now links the event title to the TBA Event page for further analysis. A new info '
-                        . 'style update is available for testing, and your feedback is requested. Try '
-                        . '*_betainfo [team number]_* and let us know which you prefer.' . "\n" . 'Some bugs were '
-                        . 'also mercilessly squashed - some events w/o a short name would be listed as blanks, all '
-                        . 'rankings are now event-wide, not just qualification-only, and TBABot now ignores '
-                        . 'Slackbot\'s DMs when team-wide announcements are made. (Let\'s not not a bot war, now '
-                        . 'shall we?) *Late Addition:* Several team\'s URLs are reported by FIRST/TBA to contain '
-                        . 'an extra / character before the address, which breaks the Slack parser and makes things '
-                        . 'ugly. It\'s fixed as of about 10AM Eastern.');
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
-
-                    $attachment =  new Attachment('Command Changes - Sept 5, 2016', 'Changes have been made to the '
-                        . '*_info_* command such that it now has additional information. Also, sending a team number '
-                        . 'in place of a command will now return the short info form that *_info_* used to provide.');
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
                     self::sendReply($teamId, $channelCache, $helpText, $replyTo, $attachments);
                     break;
                 default:
@@ -504,7 +478,7 @@ class ProcessMessage
         $status = $tba->getTBAStatus();
         $district = $team->getDistrict($status->getCurrentSeason());
 
-        self::sendReply($teamId, $channelCache, "FRC Team " . $team->getTeamNumber() . ", " . $team->getNickname()
+        self::sendReply($teamId, $channelCache, "Team " . $team->getTeamNumber() . ", " . $team->getNickname()
             . " out of " . $team->getLocation()
             . ($district == null ? '' : " in the " . $district->getName() . " region."), $replyTo);
     }
@@ -533,47 +507,14 @@ class ProcessMessage
         $district = $team->getDistrict($status->getCurrentSeason());
         $record = $team->getTeamRecord($status->getCurrentSeason());
 
-        self::sendReply($teamId, $channelCache, "FRC Team " . $team->getTeamNumber() . ", " . $team->getNickname()
-            . " out of " . $team->getLocation()
-            . ($district == null ? '' : " in the " . $district->getName() . " region") . ". "
-            . ($team->getWebsite() == null ? '' : "They have a website at " . $team->getWebsite() . ".")
-            . " They were FRC rookies in " . $team->getRookieYear() . "."
-            . ($record == null ? '' : " They are " . $record['wins'] . '-' . $record['losses']
-                . '-' . $record['ties'] . " across " . $record['competitions'] . " events."), $replyTo);
-    }
-
-    /**
-     * A/B testing output from processInfoRequest
-     *
-     * @param string $teamId Slack TeamId
-     * @param array $channelCache Channel Cache as stored by the DB
-     * @param int $teamInfoRequestedFor FRC team number
-     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
-     */
-    private static function processBetaInfoRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
-
-        $teamInfoRequestedFor = 'frc' . $teamInfoRequestedFor;
-
-        $team = $tba->getTeam($teamInfoRequestedFor);
-
-        if ($team == null) {
-            self::sendUnknownTeam($teamId, $channelCache);
-            return;
-        }
-
-        $status = $tba->getTBAStatus();
-        $district = $team->getDistrict($status->getCurrentSeason());
-        $record = $team->getTeamRecord($status->getCurrentSeason());
-
-        self::sendReply($teamId, $channelCache, "Team " . $team->getTeamNumber() . ", "
+        self::sendReply($teamId, $channelCache, 'Team ' . $team->getTeamNumber() . ', '
             . ($team->getWebsite() == null ? '' : '<' . $team->getWebsite() . '|') . $team->getNickname()
-            . ($team->getWebsite() == null ? '' : '>') . " • " . $team->getLocation() . "\n"
-            . ($team->getRookieYear() == null ? '' : 'Since ' . $team->getRookieYear())
-            . ($district == null ? '' : " • " . $district->getName() . " District")
-            . ($record == null ? '' : " • " . $record['wins'] . '-' . $record['losses']
-                . '-' . $record['ties'] . ", (" . $record['competitions'] . ') ' . $status->getCurrentSeason()
-                . " Events") . ' • ' . '<https://thebluealliance.com/team/' . $team->getTeamNumber() . '|View on TBA>',
+            . ($team->getWebsite() == null ? '' : '>') . ' • From ' . $team->getLocation() . "\n"
+            . ($team->getRookieYear() == null ? '' : 'Founded ' . $team->getRookieYear())
+            . ($district == null ? '' : ' • ' . $district->getName() . ' District')
+            . ($record == null ? '' : ' • ' . $record['wins'] . '-' . $record['losses']
+                . '-' . $record['ties'] . ' in ' . $record['competitions'] . ' ' . $status->getCurrentSeason()
+                . ' Events') . ' • ' . '<https://thebluealliance.com/team/' . $team->getTeamNumber() . '|View on TBA>',
             $replyTo);
     }
 
@@ -649,16 +590,17 @@ class ProcessMessage
             }
         }
 
-        self::sendReply($teamId, $channelCache, "FRC Team " . $team->getTeamNumber() . ", " . $team->getNickname()
-            . " out of " . $team->getLocation()
-            . ($district == null ? '' : " in the " . $district->getName() . " region") . ". "
-            . ($team->getWebsite() == null ? '' : "They have a website at " . $team->getWebsite() . ".")
-            . " They were FRC rookies in " . $team->getRookieYear() . "."
-            . ($record == null ? '' : " They are " . $record['officialWins'] . '-' . $record['officialLosses']
-                . '-' . $record['officialTies'] . " across " . $record['officialCompetitions']
-                . " official events" . ($record['unofficialCompetitions'] == 0 ? '.' : " and " . $record['wins']
+        self::sendReply($teamId, $channelCache, 'Team ' . $team->getTeamNumber() . ', ' . $team->getNickname()
+            . ' out of ' . $team->getLocation()
+            . ($district == null ? '' : ' in the ' . $district->getName() . ' region') . ".\n"
+            . ($team->getWebsite() == null ? '' : '<' . $team->getWebsite() . '>')
+            . ' • Founded in ' . $team->getRookieYear()
+            . ($record == null ? '' : "\n" .$record['officialWins'] . '-' . $record['officialLosses']
+                . '-' . $record['officialTies'] . ' in ' . $record['officialCompetitions']
+                . " official events" . ($record['unofficialCompetitions'] == 0 ? '' : ' • ' . $record['wins']
                     . '-' . $record['losses'] . '-' . $record['ties']
-                    . " across " . $record['competitions'] . ' total events.')), $replyTo,
+                    . " in " . $record['competitions'] . ' overall events.')
+            . ' • ' . '<https://thebluealliance.com/team/' . $team->getTeamNumber() . '|View on TBA>'), $replyTo,
             $attachments);
     }
 
