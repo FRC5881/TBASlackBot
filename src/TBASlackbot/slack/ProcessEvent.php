@@ -36,6 +36,9 @@ class ProcessEvent
         if ($event->type === 'message') {
             ProcessMessage::process($teamId, $event->user, $event->text, $event->channel);
             return;
+        } else if ($event->type === 'team_join') {
+            // New user joining the Slack team, ignore.
+            return;
         }
 
         error_log("Unknown handler for event type " . $event->type);
