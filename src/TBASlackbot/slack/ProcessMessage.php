@@ -22,6 +22,7 @@ use Slack\ApiClient;
 use Slack\Message\Attachment;
 use TBASlackbot\tba\TBAClient;
 use TBASlackbot\utils\DB;
+use TBASlackbot\utils\Random;
 
 /**
  * Handles inbound messages from Slack users.
@@ -158,6 +159,8 @@ class ProcessMessage
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     self::processInfoRequest($teamId, $channelCache,
                         self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                } else if ($wordArray[$startWord+1]) {
+                    self::sendInvalidTeamNumber($teamId, $channelCache, 'info', $replyTo);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
                 }
@@ -168,6 +171,8 @@ class ProcessMessage
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     self::processBetaInfoRequest($teamId, $channelCache,
                         self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                } else if ($wordArray[$startWord+1]) {
+                    self::sendInvalidTeamNumber($teamId, $channelCache, 'betainfo', $replyTo);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
                 }
@@ -179,6 +184,8 @@ class ProcessMessage
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     self::processDetailRequest($teamId, $channelCache,
                         self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                } else if ($wordArray[$startWord+1]) {
+                    self::sendInvalidTeamNumber($teamId, $channelCache, 'detail', $replyTo);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
                 }
@@ -189,6 +196,8 @@ class ProcessMessage
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     self::processStatusRequest($teamId, $channelCache,
                         self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                } else if ($wordArray[$startWord+1]) {
+                    self::sendInvalidTeamNumber($teamId, $channelCache, 'status', $replyTo);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
                 }
@@ -202,6 +211,8 @@ class ProcessMessage
                         self::validateTeamNumber($wordArray[$startWord+1]),
                         isset($wordArray[$startWord+2]) ? strtolower($wordArray[$startWord+2]) : 'all', $messageFrom,
                         $replyTo);
+                } else if ($wordArray[$startWord+1]) {
+                    self::sendInvalidTeamNumber($teamId, $channelCache, 'follow', $replyTo);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
                 }
@@ -212,6 +223,8 @@ class ProcessMessage
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     self::processUnfollowRequest($teamId, $channelCache,
                         self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                } else if ($wordArray[$startWord+1]) {
+                    self::sendInvalidTeamNumber($teamId, $channelCache, 'unfollow', $replyTo);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
                 }
@@ -257,8 +270,45 @@ class ProcessMessage
      * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
      */
     private static function sendUnknownCommand($teamId, $channelCache, $replyTo = null) {
-        self::sendReply($teamId, $channelCache, "I'm sorry, but I'm not fully sentient yet and get confused easily. "
-            . "Perhaps asking for *_help_* would be useful?", $replyTo);
+        $replyOptions[] = "I'm sorry, but I'm not fully sentient yet and get confused easily. Perhaps asking "
+            . "for *_help_* would be useful?";
+        $replyOptions[] = "My apologies, but I don't understand what you'd like to to do. Could I offer you some "
+            . "*_help_*?";
+        $rareReplyOptions[] = "I'm sorry, but even 1.21 gigawatts isn't enough power for me to figure that out. "
+            . "How about some *_help_*?";
+        $rareReplyOptions[] = "Huh? What? Oh, sorry, I was pining over a picture of Watson. I don't know how to help "
+            . "with that, maybe try asking for *_help_*?";
+        $rareReplyOptions[] = "I'm sorry Dave, I'm afraid I can't do that. What? Not Dave? Oh, just ask for *_help_* then.";
+        $rareReplyOptions[] = "Can't a bot just read Chief Delphi threads on Computer Vision in peace? I have no idea "
+            . "what that means, have you tried asking for *_help_*?";
+        $rareReplyOptions[] = "I don't know what that means, or why Sarah Connor is always after my friends... "
+            . "Could I suggest asking for *_help_* instead?";
+        $veryRareReplyOptions[] = "Chute door? Yes, chute door. But I still don't know what _you_ want. Try asking "
+            . "for *_help_*.";
+
+        self::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions, 10,
+            $veryRareReplyOptions), $replyTo);
+    }
+
+    /**
+     * Send a message to the user that the command requested had an invalid team number.
+     *
+     * @param string $teamId Slack TeamId
+     * @param array $channelCache Channel Cache as stored by the DB
+     * @param string $command The command the user was trying to complete
+     * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
+     */
+    private static function sendInvalidTeamNumber($teamId, $channelCache, $command, $replyTo = null) {
+        $replyOptions[] = "I tried to process your *_" . $command . "_* request, but that's not a valid team number.";
+        $replyOptions[] = "I would love to help you with your *_" . $command . "_* request, but there's no way "
+            . "that's a valid team number.";
+        $rareReplyOptions[] = "I tried Watson, Deep Mind, and even the WOPR, and all he wanted was to suggest  "
+            . "playing a nice game of chess, but none of us think that's a valid team number.";
+        $veryRareReplyOptions[] = "Not even the chute door could help me with your *_" . $command . "_* request, "
+            . "because that's not a valid team number.";
+
+        self::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions, 5,
+            $veryRareReplyOptions), $replyTo);
     }
 
     /**
@@ -269,7 +319,13 @@ class ProcessMessage
      * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
      */
     private static function sendUnknownTeam($teamId, $channelCache, $replyTo = null) {
-        self::sendReply($teamId, $channelCache, "I'm sorry, but I can't find any record of that team.", $replyTo);
+        $replyOptions[] = "I'm sorry, but I can't find any record of that team.";
+        $replyOptions[] = "I've checked, but there are no records to be had for that team.";
+        $rareReplyOptions[] = "I even used _The Schwartz_ and couldn't find anything about that team.";
+        $veryRareOptions[] = "What do I look like, a card catalog? There's nothing to find for that team.";
+
+        self::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions, 2,
+            $veryRareOptions), $replyTo);
     }
 
     /**
@@ -335,6 +391,14 @@ class ProcessMessage
                     $helpText = "I'm always getting upgrades, changes, and improvements. Most of the time my users "
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
+
+                    $attachment =  new Attachment('Personality Matrix - Sept 7, 2016',
+                        'On the good news front, tbabot now has a bit more personality when giving error messages. '
+                        . 'There\'s even some rare error messages that have a _very_ low chance of appearing. On '
+                        . 'the bad news front, the easter eggs have been temporarily disabled, so you can stop '
+                        . 'flooding the bot with requests for the chute door. (No that wasn\'t one of them.)');
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
 
                     $attachment =  new Attachment('Event Eliminations and Detail - Sept 6, 2016',
                         '*_detail_* now lists Eighth-finalists, quarterfinalists, and semifinalists in the awards '
@@ -721,7 +785,15 @@ class ProcessMessage
             $updateType = 'summary competition updates';
         }
 
-        self::sendReply($teamId, $channelCache, "Got it! Now watching for $updateType for team "
+        $replyOptions[] = "Got it!";
+        $replyOptions[] = "Ok, boss!";
+        $replyOptions[] = "I'm on it!";
+        $rareReplyOptions[] = "Printing the punch card!";
+        $rareReplyOptions[] = "Etching the stone tablet!";
+
+
+        self::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions)
+            . " Now watching for $updateType for team "
             . $team->getTeamNumber() . " (" . $team->getNickname() . ") and will update this channel as they come in. "
             . "To stop, just ask me to *_unfollow " . $team->getTeamNumber() . "_* from this channel.", $replyTo);
     }
@@ -745,13 +817,28 @@ class ProcessMessage
 
             $db->deleteSlackTeamSubscription($teamId, $channelCache['channelId'], $teamStatusRequestedFor);
 
-            self::sendReply($teamId, $channelCache, ":cry: I'm not following team " . $team->getTeamNumber()
-                . " (" . $team->getNickname() . ") for you any longer. I hope you weren't their only friend. :sob:",
+            $replyOptions[] = ":cry: I'm not following team " . $team->getTeamNumber()
+                . " (" . $team->getNickname() . ") for you any longer.";
+            $replyOptions[] = ":sob: I'm not following team " . $team->getTeamNumber()
+                . " (" . $team->getNickname() . ") for you any longer. I hope they don't get lonely.";
+            $rareReplyOptions[] = "I'm not following team " . $team->getTeamNumber()
+                . " (" . $team->getNickname() . ") for you any longer. And I had just finished sorting the "
+                . " punch cards.";
+
+            self::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions),
                 $replyTo);
         } else {
-            self::sendReply($teamId, $channelCache, "Uh... :worried: Sorry boss... I.. uh... Can't find a subscription "
+            $replyOptions[] = "Uh... :worried: Sorry boss... I.. uh... Can't find a subscription "
                 . "for team $teamStatusRequestedFor for this channel. I really hope I didn't lose it. Maybe check "
-                . "and see who I'm *_following_* in this channel?", $replyTo);
+                . "and see who I'm *_following_* in this channel?";
+            $replyOptions[] = "One second... Uh... :worried: I.. uh... Can't find a subscription "
+                . "for team $teamStatusRequestedFor for this channel. I usually have a good memory, maybe check "
+                . "and see who I'm *_following_* in this channel?";
+            $rareReplyOptions[] = "I've scoured the matrix and can't find any subscription for $teamStatusRequestedFor "
+                . "anywhere. Have you tried asking your operator who I'm supposed to be *_following_*?";
+
+            self::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions),
+                $replyTo);
         }
     }
 
@@ -769,7 +856,10 @@ class ProcessMessage
         $subs = $db->getSlackTeamSubscriptions($teamId, $channelCache['channelId']);
 
         if ($subs) {
-            $reply = "Lets see here, according to this punch card, I'm following:";
+            $replyOptions[] = "Lets see here, according to this punch card, I'm following:";
+            $replyOptions[] = "Lets see here, according to this stone tablet, I'm following:";
+            $replyOptions[] = "Lets see here, according to this reel-to-reel tape drive, I'm following:";
+            $reply = Random::replyRandomizer($replyOptions, array());
 
             foreach ($subs as $sub) {
                 $team = $tba->getTeam('frc' . $sub['frcTeam']);
@@ -785,10 +875,15 @@ class ProcessMessage
             }
             self::sendReply($teamId, $channelCache, $reply, $replyTo);
         } else {
-            self::sendReply($teamId, $channelCache, "It gets boring around here with nothing to do, no one to keep "
+            $replyOptions[] = "I'm not following any teams in this channel. If you'd like me to, there's information "
+                . "available if you ask for *_help subscribe_*.";
+            $rareReplyOptions[] = "What teams am I following? It's a short list, because there aren't any. Try asking "
+                . "*_help subscribe_* for how to get started.";
+            $veryRareReplyOptions[] = "It gets boring around here with nothing to do, no one to keep "
                 . "track of.... I just sit here and spin my CPU cycles hoping, begging, somebody will come by and "
-                . "ask me to *_follow [team number]_* and make me useful. _Don't we all just want to be useful?_",
-                $replyTo);
+                . "ask me to *_follow [team number]_* and make me useful. _Don't we all just want to be useful?_";
+            self::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions, 5,
+                $veryRareReplyOptions), $replyTo);
         }
     }
 

@@ -39,6 +39,7 @@ require_once('tba/objects/webhooks/CompetitionLevelStarting.php');
 require_once('tba/objects/webhooks/UpcomingMatch.php');
 require_once('tba/objects/yearspecific/ScoreBreakdown2016.php');
 require_once('utils/DB.php');
+require_once('utils/Random.php');
 
 if (!defined('PHP_INT_MIN')) {
     define('PHP_INT_MIN', -9223372036854775808);
