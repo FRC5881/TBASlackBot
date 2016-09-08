@@ -90,6 +90,13 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
+                    $attachment =  new Attachment('Group Messaging Fixed - Sept 8, 2016',
+                        'Due to an oversight in selecting the messages to forward in the Slack Event API, the bot '
+                        . 'was unable to see, or respond to, messages sent in private groups. Thanks to team 5012 '
+                        . 'for pointing out the problem and helping troubleshoot.');
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
                     $attachment =  new Attachment('Personality Matrix / info and detail Changes - Sept 7, 2016',
                         'On the good news front, tbabot now has a bit more personality when giving error messages. '
                         . 'There\'s even some rare error messages that have a _very_ low chance of appearing. On '
