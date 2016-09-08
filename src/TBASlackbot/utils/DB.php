@@ -361,6 +361,32 @@ class DB
     }
 
     /**
+     * Gets a list of FRC teams subscribed to by a channel.
+     *
+     * @param int $frcTeamNumber FRC Team Number
+     * @return array[]|bool false if no subscription found, or an array of arrays with 'teamId', 'channelId', 'frcTeam',
+     * 'subscriptionType' and 'subscribedByUserId'
+     */
+    public function getSlackFRCTeamSubscriptions($frcTeamNumber) {
+        $stmt = $this->mysqli->prepare("SELECT * FROM slackTeamSubscriptions WHERE frcTeam = ?");
+        $stmt->bind_param("i", $frcTeamNumber);
+
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+
+        $subs = null;
+
+        for ($row_no = ($res->num_rows - 1); $row_no >= 0; $row_no--) {
+            $res->data_seek($row_no);
+
+            $subs[] = $res->fetch_assoc();
+        }
+
+        return $subs;
+    }
+
+    /**
      * Insert or update a subscription.
      *
      * @param string $teamId Slack TeamId

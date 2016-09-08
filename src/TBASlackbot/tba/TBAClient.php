@@ -21,6 +21,7 @@ use GuzzleHttp\Client;
 use TBASlackbot\tba\objects\Award;
 use TBASlackbot\tba\objects\District;
 use TBASlackbot\tba\objects\Event;
+use TBASlackbot\tba\objects\EventMatch;
 use TBASlackbot\tba\objects\EventMatches;
 use TBASlackbot\tba\objects\EventRankings;
 use TBASlackbot\tba\objects\Status;
@@ -263,6 +264,35 @@ class TBAClient
     }
 
     /**
+     * Gets teams at a specific event.
+     *
+     * @param string $eventId Event code
+     * @return null|Team[] null on error or array of Team objects
+     */
+    public function getEventTeams($eventId) {
+        $teams = $this->callApi("event/$eventId/teams");
+
+        if ($teams === false) {
+            error_log("Error retrieving event teams for $eventId");
+            return null;
+        }
+
+        $teams = json_decode($teams);
+
+        if ($teams === false) {
+            error_log("Error decoding event $eventId teams: $teams");
+            return null;
+        }
+
+        $objTeams = array();
+        foreach ($teams as $teamJson) {
+            $objTeams[] = new Team($this, $teamJson);
+        }
+
+        return $objTeams;
+    }
+
+    /**
      * Get a list of districts valid for a given year.
      *
      * @param int $year Year
@@ -289,6 +319,30 @@ class TBAClient
         }
 
         return $objDistricts;
+    }
+
+    /**
+     * Gets a specific match from the API.
+     *
+     * @param string $matchKey TBA match key
+     * @return null|EventMatch Null on error, otherwise EventMatch object
+     */
+    public function getMatch($matchKey) {
+        $match = $this->callApi("match/$matchKey");
+
+        if ($match === false) {
+            error_log("Error retrieving match for $matchKey");
+            return null;
+        }
+
+        $match = json_decode($match);
+
+        if ($match === false) {
+            error_log("Error decoding match: $matchKey");
+            return null;
+        }
+
+        return new EventMatch($match);
     }
 
     /**

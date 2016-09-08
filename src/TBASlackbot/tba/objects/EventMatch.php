@@ -155,14 +155,14 @@ class EventMatch
      */
     public function getWinningAlliance() {
         if (!$this->isComplete()) {
-            echo "\nNot Complete " . $this->getKey() . "\n";
+            //echo "\nNot Complete " . $this->getKey() . "\n";
             return null;
         }
 
         if (!isset($this->getScoreBreakdown()->red)
             || !isset($this->getScoreBreakdown()->blue)) {
 
-            echo "\nNo Breakdown " . $this->getKey() . "\n";
+            //echo "\nNo Breakdown " . $this->getKey() . "\n";
             return $this->redOrBlue($this->getAlliances()->getRedScore(), $this->getAlliances()->getBlueScore());
         }
 
@@ -243,6 +243,29 @@ class EventMatch
         } else if ($blue > $red) {
             return $invert ? 'red' : 'blue';
         } else {
+            return null;
+        }
+    }
+
+    /**
+     * Gets a string suitable for humans from the competition level.
+     *
+     * @param string $compLevel
+     * @return string Competition level as a full, stable word
+     */
+    public static function getStringForCompLevel($compLevel) {
+        if ($compLevel === 'qm') {
+            return 'Qualification';
+        } else if ($compLevel === 'ef') {
+            return 'Eighth-final';
+        } else if ($compLevel === 'qf') {
+            return 'Quarterfinal';
+        } else if ($compLevel === 'sf') {
+            return 'Semifinal';
+        } else if ($compLevel === 'f') {
+            return 'Final';
+        } else {
+            error_log("Unknown Competition Level: $compLevel");
             return null;
         }
     }

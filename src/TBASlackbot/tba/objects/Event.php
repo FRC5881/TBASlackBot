@@ -189,11 +189,10 @@ class Event
     /**
      * Gets the alliances for the elimination rounds of the event.
      *
-     * @return array|null Elimination Alliances
+     * @return EventAlliances Elimination Alliances
      */
     public function getAlliances() {
-        // TODO use Alliance class
-        return $this->data->alliances;
+        return new EventAlliances($this->data->alliances);
     }
 
     /**
@@ -265,6 +264,19 @@ class Event
      */
     public function isUnderway() {
         return $this->getStartDateTimestamp() < time() && time() < $this->getEndDateTimestamp();
+    }
+
+    /**
+     * Gets a list of teams at the event.
+     *
+     * @return Team[]
+     */
+    public function getEventTeams() {
+        if (!isset($this->data->eventTeams)) {
+            $this->data->eventTeams = $this->tba->getEventTeams($this->getKey());
+        }
+
+        return $this->data->eventTeams;
     }
 
     /**

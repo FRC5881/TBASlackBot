@@ -350,4 +350,18 @@ class Team
             'losses' => $officialLosses + $unofficialLosses, 'ties' => $officialTies + $unofficialTies,
             'competitions' => $officialCompetitions + $unofficialCompetitions];
     }
+
+    /**
+     * Strips the 'frc' prefix from an array of teams.
+     *
+     * @param string[] $teams Teams with 'frc' prefix
+     * @return int[] array of team w/o 'frc' prefix
+     */
+    public static function stripTagFromTeams($teams) {
+        $newTeams = array();
+        for ($i = 0; $i < count($teams); $i++) {
+            $newTeams[] = substr($teams[$i], 3);
+        }
+        return $newTeams;
+    }
 }

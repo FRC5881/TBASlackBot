@@ -52,7 +52,7 @@ class Alliances
      * @return int[] array of blue team numbers
      */
     public function getBlueTeams() {
-        return $this->stripTagFromTeams($this->data->blue->teams);
+        return Team::stripTagFromTeams($this->data->blue->teams);
     }
 
     /**
@@ -70,7 +70,7 @@ class Alliances
      * @return int[] array of red team numbers
      */
     public function getRedTeams() {
-        return $this->stripTagFromTeams($this->data->red->teams);
+        return Team::stripTagFromTeams($this->data->red->teams);
     }
 
     /**
@@ -97,19 +97,5 @@ class Alliances
         }
 
         return null;
-    }
-
-    /**
-     * Strips the 'frc' prefix from an array of teams.
-     *
-     * @param array $teams Teams with 'frc' prefix
-     * @return int[] array of team w/o 'frc' prefix
-     */
-    private function stripTagFromTeams($teams) {
-        $newTeams = array();
-        for ($i = 0; $i < count($teams); $i++) {
-            $newTeams[] = substr($teams[$i], 3);
-        }
-        return $newTeams;
     }
 }

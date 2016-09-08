@@ -41,6 +41,7 @@ while (true) {
 
     if ($gotTBAMsg) {
         echo "\n" . $message . "\n";
+        \TBASlackbot\tba\ProcessEvent::processEvent($message);
     }
 
     if (!$gotSlackMsg && !$gotTBAMsg) {

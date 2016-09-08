@@ -16,8 +16,11 @@
 
 namespace TBASlackbot\tba\objects\webhooks;
 
+use TBASlackbot\tba\objects\Team;
+
 /**
- * UpcomingMatch webhook object.
+ * UpcomingMatch web hook object.
+ * @package TBASlackbot\tba\objects\webhooks
  * @author Brian Rozmierski
  */
 class UpcomingMatch
@@ -71,6 +74,15 @@ class UpcomingMatch
      */
     public function getTeamKeys() {
         return $this->data->team_keys;
+    }
+
+    /**
+     * Gets the Team Numbers.
+     *
+     * @return int[] Array of team numbers
+     */
+    public function getTeamNumbers() {
+        return Team::stripTagFromTeams($this->getTeamKeys());
     }
 
     /**

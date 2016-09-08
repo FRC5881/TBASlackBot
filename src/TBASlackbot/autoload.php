@@ -32,6 +32,8 @@ require_once('tba/objects/Alliances.php');
 require_once('tba/objects/Award.php');
 require_once('tba/objects/District.php');
 require_once('tba/objects/Event.php');
+require_once('tba/objects/EventAlliance.php');
+require_once('tba/objects/EventAlliances.php');
 require_once('tba/objects/EventMatch.php');
 require_once('tba/objects/EventMatches.php');
 require_once('tba/objects/EventRanking.php');
