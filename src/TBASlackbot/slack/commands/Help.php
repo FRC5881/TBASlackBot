@@ -90,6 +90,30 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
+                    $attachment =  new Attachment('Following Teams This Weekend - Expectations - Sept 9, 2016',
+                        "This weekend is our first live event for TBABot , "
+                        . "<https://www.thebluealliance.com/event/2016wapp|Peak Performance> and, to be honest, "
+                        . "we're not entirely sure what to expect from an off-season event. The bot is ready to "
+                        . "handle and precess updates from TBA for the 20-odd teams competing. What we do know is "
+                        . "the information output from the bot as a result of TBA updates is not final, but should "
+                        . "still be quite useful. We welcome feedback to improve them. We also know that some "
+                        . "messages will arrive faster than the TBA API cache is invalidated. You may have seen "
+                        . "this year notifications on your Android TBA app about schedule updates, but when you "
+                        . "went to look, there was no schedule posted. We fear this may affect us as well, which "
+                        . "is why there is a link to the TBA website (which doesn't suffer this problem) on these "
+                        . "messages. Lastly, because these are off-season events, we're not sure what, if any "
+                        . "messages TBA will actually send us, as they all result from the local FMS. For example, "
+                        . "if you have a _summary_ subscription for a team, you get updates at the end of "
+                        . "competition. This is triggered by a message that awards are updated, and a check to see "
+                        . "if any matches are left to be played. If an event doesn't give awards, or doesn't post "
+                        . "them in the FMS, we won't receive that notification, and won't send the summary. So, "
+                        . "we ask all of you to bear with us as we learn exactly what works, and doesn't work, "
+                        . "during these off-season events. The good news, however, these should all be non-issues "
+                        . "for official events, as long as the FMS is connected to the internet, and say, the power "
+                        . "doesn't go out. :smile:");
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
                     $attachment =  new Attachment('Group Messaging Fixed - Sept 8, 2016',
                         'Due to an oversight in selecting the messages to forward in the Slack Event API, the bot '
                         . 'was unable to see, or respond to, messages sent in private groups. Thanks to team 5012 '
