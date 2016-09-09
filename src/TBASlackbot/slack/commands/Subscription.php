@@ -103,7 +103,7 @@ class Subscription
                 . " (" . $team->getNickname() . ") for you any longer. I hope they don't get lonely.";
             $rareReplyOptions[] = "I'm not following team " . $team->getTeamNumber()
                 . " (" . $team->getNickname() . ") for you any longer. And I had just finished sorting the "
-                . " punch cards.";
+                . "punch cards.";
 
             ProcessMessage::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions),
                 $replyTo);
