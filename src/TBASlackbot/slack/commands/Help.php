@@ -90,6 +90,15 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
+                    $attachment =  new Attachment('Making Feedback Easier - Sept 8, 2016',
+                        "We've add a new command to TBABot, *_feedback_* that can be used to send us comments, or "
+                        . "suggestions on TBABot, or even just a quick \"Thanks!\" Please feel free to use it "
+                        . "often, especially if you have a problem. Please note that _everything_ after the word "
+                        . "feedback is saved and logged, so if you're sending feedback from your super-secret "
+                        . "strategy channel, make sure it's only your feedback in the message to @tbabot.");
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
                     $attachment =  new Attachment('Following Teams This Weekend - Expectations - Sept 9, 2016',
                         "This weekend is our first live event for TBABot , "
                         . "<https://www.thebluealliance.com/event/2016wapp|Peak Performance> and, to be honest, "
@@ -187,6 +196,12 @@ class Help
 
         $attachment =  new Attachment('What\'s new or changed?', 'I\'m always getting updates and improvements. '
             . 'If you\'d like to know more about them, ask about *_help changelog_*.');
+        $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+        $attachments[] = $attachment;
+
+        $attachment =  new Attachment('Sending Feedback', 'My creators welcome and comments, good or bad, and '
+            . 'suggestions for improvement. Just type *_feedback_* and then your message, and I\'ll send it to '
+            . 'them right away.');
         $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
         $attachments[] = $attachment;
 

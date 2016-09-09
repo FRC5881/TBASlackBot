@@ -437,6 +437,30 @@ class DB
     }
 
     /**
+     * Log feedback from a user received by the bot.
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $channelId Slack ChannelId
+     * @param string $sendingUserId Slack UserId who sent the command
+     * @param string $feedback Feedback provided by the user
+     * @return bool false on error
+     */
+    public function logFeedback($teamId, $channelId, $sendingUserId, $feedback) {
+        $stmt = $this->mysqli->prepare("INSERT INTO botFeedbackLog (teamId, channelId, userId, feedback) "
+            . "VALUES (?, ?, ?, ?)");
+        $stmt->bind_param('ssss', $teamId, $channelId, $sendingUserId, $feedback);
+
+        $stmt->execute();
+
+        if ($stmt->error) {
+            error_log("logFeedback DB Error: " . $stmt->error);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Log a message received by the bot.
      *
      * @param string $teamId Slack TeamId

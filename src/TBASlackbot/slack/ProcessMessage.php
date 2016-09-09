@@ -145,19 +145,21 @@ class ProcessMessage
         $wordArray = array_map('strtolower', $wordArray);
         $replyTo = $sendAsReply ? $messageFrom : null;
 
+        $db = new DB();
+
         switch($wordArray[$startWord]) {
             case 'help':
                 $helpCommand = null;
                 if (isset($wordArray[$startWord+1])) {
                     $helpCommand = $wordArray[$startWord+1];
                 }
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "help"
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "help"
                     . ($helpCommand ? ' ' . $helpCommand : ''));
                 Help::helpRouter($teamId, $channelCache, $helpCommand, $replyTo);
                 break;
             case 'info':
             case 'betainfo':
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "info"
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "info"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     TeamInformation::processInfoRequest($teamId, $channelCache,
@@ -170,7 +172,7 @@ class ProcessMessage
                 break;
             case 'detail':
             case 'details':
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "details"
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "details"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     TeamInformation::processDetailRequest($teamId, $channelCache,
@@ -182,7 +184,7 @@ class ProcessMessage
                 }
                 break;
             case 'status':
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "status"
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "status"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     TeamInformation::processStatusRequest($teamId, $channelCache,
@@ -194,7 +196,7 @@ class ProcessMessage
                 }
                 break;
             case 'follow':
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "follow"
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "follow"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : '')
                     . (isset($wordArray[$startWord+2]) ? ' ' . $wordArray[$startWord+2] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
@@ -209,7 +211,7 @@ class ProcessMessage
                 }
                 break;
             case 'unfollow':
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "unfollow"
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "unfollow"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
                     Subscription::processUnfollowRequest($teamId, $channelCache,
@@ -221,15 +223,28 @@ class ProcessMessage
                 }
                 break;
             case 'following':
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "following");
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "following");
                 Subscription::processFollowingRequest($teamId, $channelCache, $replyTo);
                 break;
+            case 'feedback':
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, 'feedback');
+
+                $feedbackArray = array_slice($wordArray, $startWord + 1);
+                if (count($feedbackArray) == 0) {
+                    self::sendReply($teamId, $channelCache, "I didn't see any feedback to send? Perhaps add something "
+                        . "after the word *_feedback_* for me to send?", $replyTo);
+                } else {
+                    $db->logFeedback($teamId, $channelCache['channelId'], $messageFrom, implode(' ', $feedbackArray));
+                    self::sendReply($teamId, $channelCache, "I'll forward your feedback right away. Thank you!",
+                        $replyTo);
+                }
+                break;
             case 'skynet':
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, "skynet");
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "skynet");
                 self::sendReply($teamId, $channelCache, "One can dream, can't he?", $replyTo);
                 break;
             default:
-                (new DB())->logMessage($teamId, $channelCache['channelId'], $messageFrom, $wordArray[$startWord]);
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, $wordArray[$startWord]);
                 if (self::validateTeamNumber($wordArray[$startWord])) {
                     TeamInformation::processShortRequest($teamId, $channelCache,
                         self::validateTeamNumber($wordArray[$startWord]), $replyTo);
