@@ -67,5 +67,5 @@ if (!isset($_GET['code'])) {
 
 
 
-    header('Location: /tbaslackbot/');
+    header('Location: https://frc5881.github.io/TBASlackBot/complete/');
 }
