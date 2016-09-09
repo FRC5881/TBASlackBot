@@ -116,7 +116,7 @@ class ProcessMessage
 
             for ($i = 0; $i < count($wordArray); $i++) {
                 if (strpos($wordArray[$i], '<@' . $botUserId) !== false) {
-                    echo "Found my name at $i\n";
+                    //echo "Found my name at $i\n";
                     $startWord = $i + 1;
                     break;
                 }
@@ -127,6 +127,7 @@ class ProcessMessage
                 $db->logMessage($teamId, $channelCache['channelId'], $sendingUser, "@tbabot");
                 self::sendReply($teamId, $channelCache,
                     "Did someone say something? I thought I heard my name....", null);
+                return;
             }
 
             self::commandRouter($teamId, $channelCache, $wordArray, $startWord, $sendingUser, true);
