@@ -1,0 +1,20 @@
+---
+layout: post
+title:  "TBA Slack Bot Enters Open Beta"
+date:   2016-09-11 12:00:00 -0400
+categories: jekyll update
+---
+The Programming Group of Team 5881, the Tech Valley High School Dragons, is proud to announce the Open Beta for the
+ TBA Slack Bot.
+
+We wish to extend a special thank you to the teams that tested out TBABot during our closed beta and gave us
+ important, valuable feedback during the process. Special thanks to teams 3966 and 5012!
+
+Links to [Installation Instructions][install] and [Documentation][docs] can also be found at the top of the page.
+
+If you find any issues, you can feel free to report them to the bot using the __feedback__ command, or on our
+ [GitHub Issue Page][gh-issues].
+
+[install]: /install
+[docs]: /docs
+[gh-issues]: https://github.com/FRC5881/TBASlackBot/issues
