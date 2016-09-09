@@ -164,8 +164,8 @@ class TeamInformation
         ProcessMessage::sendReply($teamId, $channelCache, 'Team ' . $team->getTeamNumber() . ', ' . $team->getNickname()
             . ' out of ' . $team->getLocation()
             . ($district == null ? '' : ' in the ' . $district->getName() . ' region') . ".\n"
-            . ($team->getWebsite() == null ? '' : '<' . $team->getWebsite() . '>')
-            . ' • Founded in ' . $team->getRookieYear()
+            . ($team->getWebsite() == null ? '' : '<' . $team->getWebsite() . '> • ')
+            . 'Founded in ' . $team->getRookieYear()
             . ($record == null ? '' : "\n" .$record['officialWins'] . '-' . $record['officialLosses']
                 . '-' . $record['officialTies'] . ' in ' . $record['officialCompetitions']
                 . " official events" . ($record['unofficialCompetitions'] == 0 ? '' : ' • ' . $record['wins']
