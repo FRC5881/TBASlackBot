@@ -94,7 +94,17 @@ class Event
      * @return int Event end date as UNIX Epoch
      */
     public function getEndDateTimestamp() {
-        return date_create_from_format("Y-m-d", $this->getEndDate())->getTimestamp();
+        $existing = date_default_timezone_get();
+        date_default_timezone_set('GMT');
+
+        // We add midnight to the date string as create_date_from_format likes to add the current time if not given
+        // Thus any comparisons of > or < made on the same day fail as ==
+
+        $ret = date_create_from_format("Y-m-d H:i:s", $this->getEndDate() . " 23:59:59")->getTimestamp();
+
+        date_default_timezone_set($existing);
+
+        return $ret;
     }
 
     /**
@@ -222,7 +232,9 @@ class Event
         $existing = date_default_timezone_get();
         date_default_timezone_set('GMT');
 
-        $ret = date_create_from_format("Y-m-d", $this->getStartDate())->getTimestamp();
+        // We add midnight to the date string as create_date_from_format likes to add the current time if not given
+        // Thus any comparisons of > or < made on the same day fail as ==
+        $ret = date_create_from_format("Y-m-d H:i:s", $this->getStartDate() . " 00:00:00")->getTimestamp();
 
         date_default_timezone_set($existing);
 

@@ -225,12 +225,13 @@ class TeamInformation
 
             $output = "FRC Team " . $team->getTeamNumber() . " (" . $team->getNickname() . ") is currently at "
                 . ($activeEvent->getShortName() == null ? $activeEvent->getName() : $activeEvent->getShortName())
-                . " " . ($activeEvent->isOfficial() ? '' : '(Unofficial) ')
-                . "and is ranked " . $ranking->getRank() . "/" . $activeEventRankings->getNumberOfRankedTeams()
+                . " " . ($activeEvent->isOfficial() ? '' : '(Unofficial)')
+                . ($ranking ? " and is ranked " . $ranking->getRank() . "/" . $activeEventRankings->getNumberOfRankedTeams()
                 . " with a record of ". $activeEventRecord['wins'] . "-" . $activeEventRecord['losses'] . "-"
-                . $activeEventRecord['ties'] . "."
+                . $activeEventRecord['ties'] : ' but has played no matches yet') . "."
                 . ($lastMatch != null ? "\nLast Match: " . $lastMatch->getKey() : '')
-                . ($nextMatch != null ? "\nNext Match: " . $nextMatch->getKey() : '');
+                . ($nextMatch != null ? "\nNext Match: " . $nextMatch->getKey() : '')
+                . (count($activeEventMatches->getMatches()) == 0 ? " The match schedule has not been posted yet." : '');
             ProcessMessage::sendReply($teamId, $channelCache, $output, $replyTo);
             return;
         }
