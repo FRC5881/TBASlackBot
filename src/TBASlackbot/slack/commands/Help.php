@@ -90,7 +90,13 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
-                    $attachment =  new Attachment('Making Feedback Easier - Sept 8, 2016',
+                    $attachment =  new Attachment('Washington Peak Performance - Sept 9, 2016',
+                        "We've confirmed the FMS at Peak Performance is not hooked up to FIRST HQ and thus there "
+                        . "will be no live updates coming from the field, thus no updates from @tbabot.");
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
+                    $attachment =  new Attachment('Making Feedback Easier - Sept 9, 2016',
                         "We've add a new command to TBABot, *_feedback_* that can be used to send us comments, or "
                         . "suggestions on TBABot, or even just a quick \"Thanks!\" Please feel free to use it "
                         . "often, especially if you have a problem. Please note that _everything_ after the word "
