@@ -25,7 +25,7 @@ class ProcessEvent
     /**
      * Process the given JSON string Slack Event.
      *
-     * @param String $eventJson The raw JASON-encoded string from the Slack Event API
+     * @param String $eventJson The raw JSON-encoded string from the Slack Event API
      */
     public static function processEvent($eventJson) {
         $eventWrapper = json_decode($eventJson);
@@ -34,7 +34,9 @@ class ProcessEvent
         $event = $eventWrapper->event;
 
         if ($event->type === 'message') {
-            ProcessMessage::process($teamId, $event->user, $event->text, $event->channel);
+            if (isset($event->user)) { // Some bot messages are sent w/o a user field in the message, we can ignore them
+                ProcessMessage::process($teamId, $event->user, $event->text, $event->channel);
+            }
             return;
         } else if ($event->type === 'team_join') {
             // New user joining the Slack team, ignore.
