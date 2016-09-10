@@ -84,7 +84,6 @@ class EventAlliances
         $teams = array();
 
         foreach ($this->alliances as $alliance) {
-            echo "\nSTAGE: "; var_dump($teams); echo "\n picks: "; var_dump($alliance->getPicks());
             $teams = array_merge($teams, $alliance->getPicks());
             if ($alliance->isBackupUsed()) {
                 $teams[] = $alliance->getBackupTeamIn();
