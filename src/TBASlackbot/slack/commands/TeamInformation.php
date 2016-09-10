@@ -145,6 +145,9 @@ class TeamInformation
 
                     foreach($awards as $award) {
                         $eventText .= "\n• " . $award->getName();
+                        if ($award->getRecipientAwardee()) {
+                            $eventText .= " • " . $award->getRecipientAwardee();
+                        }
                     }
                 } else if (strlen($eventText)) {
                     $eventText .= '.';

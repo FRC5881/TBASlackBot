@@ -70,7 +70,7 @@ class Award
      * @return int|null recipient team number or null if an individual non-team award
      */
     public function getRecipientTeam() {
-        return $this->data->recipiennt_list->team_number;
+        return $this->data->recipient_list[0]->team_number;
     }
 
     /**
@@ -79,7 +79,7 @@ class Award
      * @return string|null Award recipient name, or null if not an individual award
      */
     public function getRecipientAwardee() {
-        return $this->data->recipiennt_list->awardee;
+        return $this->data->recipient_list[0]->awardee;
     }
 
     /**
