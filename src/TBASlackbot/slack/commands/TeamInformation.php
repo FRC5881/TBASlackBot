@@ -229,10 +229,30 @@ class TeamInformation
                 . ($ranking ? " and is ranked " . $ranking->getRank() . "/" . $activeEventRankings->getNumberOfRankedTeams()
                 . " with a record of ". $activeEventRecord['wins'] . "-" . $activeEventRecord['losses'] . "-"
                 . $activeEventRecord['ties'] : ' but has played no matches yet') . "."
-                . ($lastMatch != null ? "\nLast Match: " . $lastMatch->getKey() : '')
-                . ($nextMatch != null ? "\nNext Match: " . $nextMatch->getKey() : '')
                 . (count($activeEventMatches->getMatches()) == 0 ? " The match schedule has not been posted yet." : '');
-            ProcessMessage::sendReply($teamId, $channelCache, $output, $replyTo);
+
+            $attachments = array();
+
+            if ($lastMatch != null) {
+                $attachment = new Attachment('Last Match: ' . $lastMatch->getConversationalName(),
+                    'Red Alliance: ' . implode(' - ', $lastMatch->getAlliances()->getRedTeams())
+                    . ' • Score: ' . $lastMatch->getAlliances()->getRedScore()
+                    . ($lastMatch->getWinningAlliance() === 'red' ? ' (Win)' : '') . "\n"
+                    . 'Blue Alliance: ' . implode(' - ', $lastMatch->getAlliances()->getBlueTeams())
+                    . ' • Score: ' . $lastMatch->getAlliances()->getBlueScore()
+                    . ($lastMatch->getWinningAlliance() === 'blue' ? ' (Win)' : '')
+                    . ($lastMatch->getWinningAlliance() == null ? "\n Tied Match" : ''));
+                $attachments[] = $attachment;
+            }
+
+            if ($nextMatch != null) {
+                $attachment = new Attachment('Next Match: ' . $nextMatch->getConversationalName(),
+                    'Red Alliance: ' . implode(' - ', $nextMatch->getAlliances()->getRedTeams()) . "\n"
+                    . 'Blue Alliance: ' . implode(' - ', $nextMatch->getAlliances()->getBlueTeams()));
+                $attachments[] = $attachment;
+            }
+
+            ProcessMessage::sendReply($teamId, $channelCache, $output, $replyTo, $attachments);
             return;
         }
 

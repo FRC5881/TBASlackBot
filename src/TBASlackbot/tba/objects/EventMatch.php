@@ -140,6 +140,17 @@ class EventMatch
     }
 
     /**
+     * Gets an English conversation name for a match, eg "Quarterfinals 1 Match 1"
+     *
+     * @return string
+     */
+    public function getConversationalName() {
+        return self::getStringForCompLevel($this->getCompetitionLevel()) . ' '
+            . ($this->getCompetitionLevel() === 'qm' ? '' : $this->getSetNumber() . ' ')
+            . 'Match ' . $this->getMatchNumber();
+    }
+
+    /**
      * Notes if this match is complete.
      *
      * @return bool true if either the score breakdown is present, or an alliance has a score applied
