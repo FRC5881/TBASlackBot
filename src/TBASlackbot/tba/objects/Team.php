@@ -162,7 +162,7 @@ class Team
     public function getDistrict($year) {
         $teamDistricts = $this->tba->getTeamHistoryDistricts('frc' . $this->getTeamNumber());
         if ($teamDistricts != null) {
-            $code = $teamDistricts[$year];
+            $code = isset($teamDistricts[$year]) ? $teamDistricts[$year] : null;
             if ($code) {
                 $districts = $this->tba->getDistricts($year);
                 foreach($districts as $district) {
