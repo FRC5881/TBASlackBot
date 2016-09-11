@@ -174,8 +174,9 @@ class TeamInformation
                 . " official events" . ($record['unofficialCompetitions'] == 0 ? '' : ' • ' . $record['wins']
                     . '-' . $record['losses'] . '-' . $record['ties']
                     . " in " . $record['competitions'] . ' overall events.')
-                . ' • ' . '<https://thebluealliance.com/team/' . $team->getTeamNumber() . '|View on TBA>'), $replyTo,
-            $attachments);
+                . ' • ' . '<https://thebluealliance.com/team/' . $team->getTeamNumber() . '|View on TBA>')
+            . ($events ? '' : "\n I have no record of any events for this team in " . $status->getCurrentSeason())
+            , $replyTo, $attachments);
     }
 
     /**
