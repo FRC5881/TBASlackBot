@@ -12,7 +12,7 @@ source code for requirements and installation instructions.
 
 __Please read these instructions thoroughly before installing!__
 
-Currently, the bot is in a __beta__ state, with most query functions working properly. That said,
+Currently, the bot is in a __beta__ state, with most query functions and notifications working properly. That said,
 iteration in development has been on features and functions, not extensive testing. In other words, you may find
 bad output, or even ways to break the bot.
 
@@ -20,14 +20,14 @@ bad output, or even ways to break the bot.
 
 After setting up the bot, the bot will message the user that set it up with some basic information. By default,
 the bot does not join any channels (including #general) on your team. Team members can open a DM with the bot
-and issue commands. Team members with appropriate permissions can __/invite__ the bot into other channels.
+and issue commands, and members with appropriate permissions can __/invite__ the bot into other channels.
 
 __WARNING:__ The Slack Event API (which the bot uses to receive messages) does not allow the bot, or you, to filter
 what messages are received. The bot will receive a copy of __every message sent and received__ in the channels the
 bot is invited to. Currently all messages the bot receives are shown on console temporarily to aid with debugging,
-and are not permanently saved, or written to disk. Therefore nothing said in a channel the bot has been invited to 
-is private. The message logging will continue to be reduced as development moves on, as we have no interest in your
-channel chat.
+and are not permanently saved, or written to disk. Therefore nothing said in a channel the bot has been invited to, 
+at this time, is private. Presently only one person has access to the console output, our programming mentor.
+The message logging will continue to be reduced as development moves on, as we have no interest in your channel chat.
 
 __If this concerns you, simply don't invite the bot to any channels.__
 
@@ -70,7 +70,8 @@ The bot is currently being updated almost daily with improvements and updates. W
 use the __help changelog__ command to keep on top of changes and new features.
 
 ## Bugs, Problems, Feature Requests ##
-There is the __feedback__ command in the bot itself, or feel free to post an issue on GitHub.
+There is the __feedback__ command in the bot itself, or feel free to post an
+[issue on GitHub](https://github.com/FRC5881/TBASlackBot/issues) once the source code is released.
 
 ### Gracious Professionalism&reg; ###
 
