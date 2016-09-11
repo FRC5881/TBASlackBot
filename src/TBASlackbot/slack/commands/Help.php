@@ -90,9 +90,9 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
-                    $attachment =  new Attachment('Washington Peak Performance - Sept 9, 2016',
-                        "We've confirmed the FMS at Peak Performance is not hooked up to FIRST HQ and thus there "
-                        . "will be no live updates coming from the field, thus no updates from @tbabot.");
+                    $attachment =  new Attachment('Open Beta - Sept 11, 2016',
+                        "_@tbabot_ has entered Open Beta! We're very excited, and want to thank all the teams "
+                        . "that helped test, and provide feedback during our closed beta.");
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
 
@@ -102,55 +102,6 @@ class Help
                         . "often, especially if you have a problem. Please note that _everything_ after the word "
                         . "feedback is saved and logged, so if you're sending feedback from your super-secret "
                         . "strategy channel, make sure it's only your feedback in the message to @tbabot.");
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
-
-                    $attachment =  new Attachment('Following Teams This Weekend - Expectations - Sept 9, 2016',
-                        "This weekend is our first live event for TBABot , "
-                        . "<https://www.thebluealliance.com/event/2016wapp|Peak Performance> and, to be honest, "
-                        . "we're not entirely sure what to expect from an off-season event. The bot is ready to "
-                        . "handle and precess updates from TBA for the 20-odd teams competing. What we do know is "
-                        . "the information output from the bot as a result of TBA updates is not final, but should "
-                        . "still be quite useful. We welcome feedback to improve them. We also know that some "
-                        . "messages will arrive faster than the TBA API cache is invalidated. You may have seen "
-                        . "this year notifications on your Android TBA app about schedule updates, but when you "
-                        . "went to look, there was no schedule posted. We fear this may affect us as well, which "
-                        . "is why there is a link to the TBA website (which doesn't suffer this problem) on these "
-                        . "messages. Lastly, because these are off-season events, we're not sure what, if any "
-                        . "messages TBA will actually send us, as they all result from the local FMS. For example, "
-                        . "if you have a _summary_ subscription for a team, you get updates at the end of "
-                        . "competition. This is triggered by a message that awards are updated, and a check to see "
-                        . "if any matches are left to be played. If an event doesn't give awards, or doesn't post "
-                        . "them in the FMS, we won't receive that notification, and won't send the summary. So, "
-                        . "we ask all of you to bear with us as we learn exactly what works, and doesn't work, "
-                        . "during these off-season events. The good news, however, these should all be non-issues "
-                        . "for official events, as long as the FMS is connected to the internet, and say, the power "
-                        . "doesn't go out. :smile:");
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
-
-                    $attachment =  new Attachment('Group Messaging Fixed - Sept 8, 2016',
-                        'Due to an oversight in selecting the messages to forward in the Slack Event API, the bot '
-                        . 'was unable to see, or respond to, messages sent in private groups. Thanks to team 5012 '
-                        . 'for pointing out the problem and helping troubleshoot.');
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
-
-                    $attachment =  new Attachment('Personality Matrix / info and detail Changes - Sept 7, 2016',
-                        'On the good news front, tbabot now has a bit more personality when giving error messages. '
-                        . 'There\'s even some rare error messages that have a _very_ low chance of appearing. On '
-                        . 'the bad news front, the easter eggs have been temporarily disabled, so you can stop '
-                        . 'flooding the bot with requests for the chute door. (No that wasn\'t one of them.)' . "\n"
-                        . 'Thanks for the feedback, as a result changes have been made to the *_info_* and '
-                        . '*_detail_* commands to make the output a bit cleaner. A link to the team TBA page '
-                        . 'has also been added to the detail output.');
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
-
-                    $attachment =  new Attachment('Event Eliminations and Detail - Sept 6, 2016',
-                        '*_detail_* now lists Eighth-finalists, quarterfinalists, and semifinalists in the awards '
-                        . 'section of the event. We welcome feedback on it\'s placement, and we know full well it\'s '
-                        . 'not an official award, however, from an ease of use standpoint it seemed best.');
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
 
