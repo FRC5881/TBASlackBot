@@ -10,6 +10,7 @@ The following software is required:
 
 * PHP 5.6 - Web Server and CLI
 * MySQL 5.7 or later
+* CURL (If using analytics)
 * System V Message Queues [For this PHP function](https://secure.php.net/manual/en/function.msg-get-queue.php)
 * Composer
 * SSL-Enabled Website (For Slack API)

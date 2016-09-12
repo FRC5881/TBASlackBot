@@ -43,6 +43,7 @@ require_once('tba/objects/Team.php');
 require_once('tba/objects/webhooks/CompetitionLevelStarting.php');
 require_once('tba/objects/webhooks/UpcomingMatch.php');
 require_once('tba/objects/yearspecific/ScoreBreakdown2016.php');
+require_once('utils/Analytics.php');
 require_once('utils/DB.php');
 require_once('utils/Random.php');
 

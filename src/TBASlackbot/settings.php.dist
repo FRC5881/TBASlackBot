@@ -95,6 +95,12 @@ if (!defined('TBASLACKBOT')) {
      */
     date_default_timezone_set('America/New_York');
 
+    /**
+     * Google Analytics ID, set to empty string to disable.
+     */
+    define('TBASLACKBOT_GOOGLE_ANALYTICS_ID', '');
+
+
 
     /*******************************
      * DO NOT EDIT BELOW THIS LINE *

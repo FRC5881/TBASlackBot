@@ -23,6 +23,7 @@ use Slack\Message\Attachment;
 use TBASlackbot\slack\commands\Help;
 use TBASlackbot\slack\commands\Subscription;
 use TBASlackbot\slack\commands\TeamInformation;
+use TBASlackbot\utils\Analytics;
 use TBASlackbot\utils\DB;
 use TBASlackbot\utils\Random;
 
@@ -127,6 +128,7 @@ class ProcessMessage
                 $db->logMessage($teamId, $channelCache['channelId'], $sendingUser, "@tbabot");
                 self::sendReply($teamId, $channelCache,
                     "Did someone say something? I thought I heard my name....", null);
+                Analytics::trackSlackEvent($teamId, $sendingUser, $channelCache, 'error', null, null);
                 return;
             }
 
@@ -157,43 +159,52 @@ class ProcessMessage
                 $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "help"
                     . ($helpCommand ? ' ' . $helpCommand : ''));
                 Help::helpRouter($teamId, $channelCache, $helpCommand, $replyTo);
+                Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'help', null, null);
                 break;
             case 'info':
-            case 'betainfo':
                 $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "info"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
-                    TeamInformation::processInfoRequest($teamId, $channelCache,
-                        self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                    $teamNumber = self::validateTeamNumber($wordArray[$startWord+1]);
+                    TeamInformation::processInfoRequest($teamId, $channelCache, $teamNumber, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'info', $teamNumber, null);
                 } else if ($wordArray[$startWord+1]) {
                     self::sendInvalidTeamNumber($teamId, $channelCache, 'info', $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'error', null, null);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'unknown', null, null);
                 }
                 break;
             case 'detail':
             case 'details':
-                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "details"
+                $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "detail"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
-                    TeamInformation::processDetailRequest($teamId, $channelCache,
-                        self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                    $teamNumber = self::validateTeamNumber($wordArray[$startWord+1]);
+                    TeamInformation::processDetailRequest($teamId, $channelCache, $teamNumber, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'detail', $teamNumber, null);
                 } else if ($wordArray[$startWord+1]) {
                     self::sendInvalidTeamNumber($teamId, $channelCache, 'detail', $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'error', null, null);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'unknown', null, null);
                 }
                 break;
             case 'status':
                 $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "status"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
-                    TeamInformation::processStatusRequest($teamId, $channelCache,
-                        self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                    $teamNumber = self::validateTeamNumber($wordArray[$startWord+1]);
+                    TeamInformation::processStatusRequest($teamId, $channelCache, $teamNumber, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'status', $teamNumber, null);
                 } else if ($wordArray[$startWord+1]) {
                     self::sendInvalidTeamNumber($teamId, $channelCache, 'status', $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'error', null, null);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'unknown', null, null);
                 }
                 break;
             case 'follow':
@@ -201,31 +212,38 @@ class ProcessMessage
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : '')
                     . (isset($wordArray[$startWord+2]) ? ' ' . $wordArray[$startWord+2] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
-                    Subscription::processFollowRequest($teamId, $channelCache,
-                        self::validateTeamNumber($wordArray[$startWord+1]),
+                    $teamNumber = self::validateTeamNumber($wordArray[$startWord+1]);
+                    Subscription::processFollowRequest($teamId, $channelCache, $teamNumber,
                         isset($wordArray[$startWord+2]) ? strtolower($wordArray[$startWord+2]) : 'all', $messageFrom,
                         $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'follow', $teamNumber, null);
                 } else if ($wordArray[$startWord+1]) {
                     self::sendInvalidTeamNumber($teamId, $channelCache, 'follow', $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'error', null, null);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'unknown', null, null);
                 }
                 break;
             case 'unfollow':
                 $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "unfollow"
                     . (isset($wordArray[$startWord+1]) ? ' ' . $wordArray[$startWord+1] : ''));
                 if ($wordArray[$startWord+1] && self::validateTeamNumber($wordArray[$startWord+1])) {
-                    Subscription::processUnfollowRequest($teamId, $channelCache,
-                        self::validateTeamNumber($wordArray[$startWord+1]), $replyTo);
+                    $teamNumber = self::validateTeamNumber($wordArray[$startWord+1]);
+                    Subscription::processUnfollowRequest($teamId, $channelCache, $teamNumber, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'unfollow', $teamNumber, null);
                 } else if ($wordArray[$startWord+1]) {
                     self::sendInvalidTeamNumber($teamId, $channelCache, 'unfollow', $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'error', null, null);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'unknown', null, null);
                 }
                 break;
             case 'following':
                 $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, "following");
                 Subscription::processFollowingRequest($teamId, $channelCache, $replyTo);
+                Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'following', null, null);
                 break;
             case 'feedback':
                 $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, 'feedback');
@@ -234,10 +252,12 @@ class ProcessMessage
                 if (count($feedbackArray) == 0) {
                     self::sendReply($teamId, $channelCache, "I didn't see any feedback to send? Perhaps add something "
                         . "after the word *_feedback_* for me to send?", $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'error', null, null);
                 } else {
                     $db->logFeedback($teamId, $channelCache['channelId'], $messageFrom, implode(' ', $feedbackArray));
                     self::sendReply($teamId, $channelCache, "I'll forward your feedback right away. Thank you!",
                         $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'feedback', null, null);
                 }
                 break;
             case 'skynet':
@@ -247,10 +267,12 @@ class ProcessMessage
             default:
                 $db->logMessage($teamId, $channelCache['channelId'], $messageFrom, $wordArray[$startWord]);
                 if (self::validateTeamNumber($wordArray[$startWord])) {
-                    TeamInformation::processShortRequest($teamId, $channelCache,
-                        self::validateTeamNumber($wordArray[$startWord]), $replyTo);
+                    $teamNumber = self::validateTeamNumber($wordArray[$startWord]);
+                    TeamInformation::processShortRequest($teamId, $channelCache, $teamNumber, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'shortinfo', $teamNumber, null);
                 } else {
                     self::sendUnknownCommand($teamId, $channelCache, $replyTo);
+                    Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'unknown', null, null);
                 }
         }
     }
