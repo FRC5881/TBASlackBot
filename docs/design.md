@@ -147,12 +147,13 @@ layer stores the date/time the last request to the API was made, including reque
 code can implement a minimum amount of time the cached entry we checked is considered valid, no matter when TBA
 last updated it, before attempting the API call again for an update.
 
-| Column             | Purpose                                           |
-| ------------------ | ------------------------------------------------- |
-| apiCall            | The API URL endpoint that was called              |
-| lastModified       | The X-Last-Modified header from the API result    |
-| apiJsonString      | The Raw JSON string returned by the API           |
-| lastRetrieval      | The date/time the DB cache entry was last updated |
+| Column             | Purpose                                                    |
+| ------------------ | ---------------------------------------------------------- |
+| apiCall            | The API URL endpoint that was called                       |
+| lastModified       | The X-Last-Modified header from the API result             |
+| apiJsonString      | The Raw JSON string returned by the API                    |
+| lastRetrieval      | The date/time the DB cache entry was last updated          |
+| expires            | The date/time the cached entry expires, as provided by TBA |
 
 MySQL DDL:
 ```
@@ -161,7 +162,8 @@ CREATE TABLE tbaApiCache
     apiCall VARCHAR(255) PRIMARY KEY NOT NULL,
     lastModified DATETIME NOT NULL,
     apiJsonString LONGTEXT,
-    lastRetrieval DATETIME NOT NULL
+    lastRetrieval DATETIME NOT NULL,
+    expires DATETIME NOT NULL
 );
 ```
 

@@ -59,12 +59,12 @@ class TBAClient
     }
 
     /**
-     * Gets the TBA Status result. Cached for 10 minutes.
+     * Gets the TBA Status result. Cached for 1 hour.
      *
      * @return null|Status
      */
     public function getTBAStatus() {
-        $status = $this->callApi('status', 600);
+        $status = $this->callApi('status', 3600);
 
         if ($status === false) {
             error_log("Error retrieving status");
@@ -355,7 +355,7 @@ class TBAClient
      * object will be returned outright.
      * @return bool|string False on error, or JSON string, potentially cached
      */
-    private function callApi($urlStub, $minCacheTime = 120) {
+    private function callApi($urlStub, $minCacheTime = 60) {
         //error_log("Calling $urlStub");
         $opts = array('http_errors' => false);
 
@@ -367,7 +367,8 @@ class TBAClient
             $lastModified = $cached['lastModified'];
 
             if ($cached['lastModifiedUnix'] + $minCacheTime >= time()
-                || $cached['lastRetrieval'] + $minCacheTime >= time()) {
+                || $cached['lastRetrieval'] + $minCacheTime >= time()
+                || $cached['expires'] >= time()) {
                 return $cached['apiJsonString'];
             }
         }
@@ -378,17 +379,44 @@ class TBAClient
 
         $response = $this->httpClient->get(self::$URLBASE . $urlStub, $opts);
 
+        $maxAge = $this->parseCacheControl($response->getHeaderLine('Cache-Control'));
+
         if ($response->getStatusCode() == 304 && $cached) {
-            $this->db->setTBAApiCacheChecked($urlStub);
+            $this->db->setTBAApiCacheChecked($urlStub, $maxAge);
             return $cached['apiJsonString'];
         } elseif ($response->getStatusCode() != 200) {
             return false;
         }
 
         if ($response->getHeaderLine('Last-Modified')) {
-            $this->db->setTBAApiCache($urlStub, $response->getHeaderLine('Last-Modified'), $response->getBody());
+            $this->db->setTBAApiCache($urlStub, $response->getHeaderLine('Last-Modified'), $response->getBody(),
+                $maxAge);
         }
 
         return $response->getBody();
+    }
+
+    /**
+     * Parses the Cache-Control header and returns the max-age parameter. If no header exists, or the max-age
+     * can't be parsed returns 0, return 61 if the header is there but doesn't specify max-age.
+     *
+     * @param string $cacheControl Value of the Cache-Control response header
+     * @return int max-age as set by the header, 61 if the header is set but doesn't specify, or 0 if no header, or
+     * the max-age is not able to be parsed
+     */
+    private function parseCacheControl($cacheControl) {
+        if (!$cacheControl) {
+            // If there is no Cache-Control header, don't cache the value
+            return 0;
+        }
+        $agePos = strpos($cacheControl, "max-age=");
+
+        if ($agePos) {
+            $age = intval(substr($cacheControl, $agePos + 8));
+            return $age;
+        } else {
+            // If we have the header, but no max-age, lets cache for about a minute
+            return 61;
+        }
     }
 }

@@ -248,7 +248,8 @@ class DB
         $stmt = $this->mysqli->prepare("SELECT apiCall, "
             . "DATE_FORMAT(lastModified, '%a, %e %b %Y %H:%i:%s GMT') as lastModified, "
             . "UNIX_TIMESTAMP(CONVERT_TZ(lastModified, '+00:00', @@global.time_zone)) as lastModifiedUnix, "
-            . "apiJsonString, UNIX_TIMESTAMP(lastRetrieval) as lastRetrieval FROM tbaApiCache WHERE apiCall = ?");
+            . "apiJsonString, UNIX_TIMESTAMP(lastRetrieval) as lastRetrieval, UNIX_TIMESTAMP(expires) as expires "
+            . "FROM tbaApiCache WHERE apiCall = ?");
         $stmt->bind_param("s", $apiCall);
 
         $stmt->execute();
@@ -268,14 +269,17 @@ class DB
      * @param string $apiCall TBA API URL stub containing the API call
      * @param string $lastModified HTTP RFC formatted date string of last modification by the TBA server
      * @param string $json raw JSON string returned by the API
+     * @param int $expires number of seconds from now the cached entry expires
      * @return bool true on successful insert/update
      */
-    public function setTBAApiCache($apiCall, $lastModified, $json) {
-        $stmt = $this->mysqli->prepare("INSERT INTO tbaApiCache (apiCall, lastModified, apiJsonString, lastRetrieval) "
-            . "VALUES (?, STR_TO_DATE(?, '%a, %e %b %Y %H:%i:%s GMT'), ?, now()) "
+    public function setTBAApiCache($apiCall, $lastModified, $json, $expires) {
+        $stmt = $this->mysqli->prepare("INSERT INTO tbaApiCache "
+            . "(apiCall, lastModified, apiJsonString, lastRetrieval, expires) "
+            . "VALUES (?, STR_TO_DATE(?, '%a, %e %b %Y %H:%i:%s GMT'), ?, now(), "
+                . "FROM_UNIXTIME(UNIX_TIMESTAMP(NOW()) + ?)) "
             . "ON DUPLICATE KEY UPDATE apiCall = VALUES(apiCall), lastModified = VALUES(lastModified), "
-            . "apiJsonString = VALUES(apiJsonString), lastRetrieval = now()");
-        $stmt->bind_param('sss', $apiCall, $lastModified, $json);
+            . "apiJsonString = VALUES(apiJsonString), lastRetrieval = now(), expires = VALUES(expires)");
+        $stmt->bind_param('sssi', $apiCall, $lastModified, $json, $expires);
 
         $stmt->execute();
 
@@ -292,11 +296,13 @@ class DB
      * changed.
      *
      * @param string $apiCall TBA API URL stub containing the API call
+     * @param int $expires number of seconds from now the cached entry expires
      * @return bool true on successful update
      */
-    public function setTBAApiCacheChecked($apiCall) {
-        $stmt = $this->mysqli->prepare("UPDATE tbaApiCache SET lastRetrieval = now() WHERE apiCall = ?");
-        $stmt->bind_param('s', $apiCall);
+    public function setTBAApiCacheChecked($apiCall, $expires) {
+        $stmt = $this->mysqli->prepare("UPDATE tbaApiCache SET lastRetrieval = now(), "
+            . "expires = FROM_UNIXTIME(UNIX_TIMESTAMP(NOW()) + ?) WHERE apiCall = ?");
+        $stmt->bind_param('is', $expires, $apiCall);
 
         $stmt->execute();
 
