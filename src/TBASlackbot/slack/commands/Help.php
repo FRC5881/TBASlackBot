@@ -90,6 +90,20 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
+                    $attachment =  new Attachment('Live Events and Future Updates - Sept 21, 2016',
+                        "First, welcome to all our new users in Open Beta! We have been waiting to test the "
+                        . "following features during live events this off season. Unfortunately, all of the "
+                        . "events the last several weeks have not been able to provide FIRST/TBA with live "
+                        . "data from the field FMS, and we've been unable to fully test the feature. With 5 "
+                        . "events coming up this weekend, we may finally get to see this in action. If things "
+                        . "look weird, or data looks off, please use the _feedback_ command and let us know!\n"
+                        . "We also have a number of features planned and upgrades to do to _@tbabot_ before "
+                        . "the launch of FIRST STEAMWORKS, the next of which will be purely backend as we update "
+                        . "our caching mechanisms to reduce load on TBA.\n"
+                        . "Thanks for your patience!");
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
                     $attachment =  new Attachment('Open Beta - Sept 11, 2016',
                         "_@tbabot_ has entered Open Beta! We're very excited, and want to thank all the teams "
                         . "that helped test, and provide feedback during our closed beta.");
