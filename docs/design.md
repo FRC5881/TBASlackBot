@@ -38,6 +38,29 @@ subscriptions, and sending messages back to Slack as needed.
 
 The `TBA` section also provides for the API calls for information lookup, and caching, as needed.
 
+#### Caching
+
+TBA offers several hints and methods to reduce the number of API calls required, and to maximize the use of both local
+and server-side caches. First, all responses from the API include a `Last-Modified` header which contains the date and 
+time the context was last updated on TBA. By caching that response, with that value, on subsequent requests we can send
+the `If-Modified-Since` header, with that same value. If the content hadn't changed, the server will respond with a 304
+message, and we can use the cached value.
+
+In addition many, if not all, responses also come with the `Cache-Control` header which has a `max-age` value. We can
+use that value to know that the response can be locally cached for at least that many seconds.
+
+Finally, when we store the cached responses we also store the date/time of the last request. We update that, and the
+`Cache-Control` value on any subsequent request, regardless if the cached value was used.
+
+Thus, we can build a request by first pulling the locally cached value, checking to see if the internal API call
+specified a minimum cache time and returning the cached value if that hasn't expired. We also check the `Cache-Control`
+expiration, and will return the cached value as well if that has not expired. Then, and only then do we build the
+actual TBA API call, and update the cache based on it's result.
+
+This allows us to specify, for example, all `status` API calls are cached for an hour (as we only use the current 
+season value, it should be valid for quite some time), regardless of the API result. We can also do things like
+make nested and duplicate requests to the API as the subsequent requests will return the locally cached data.
+
 ### Database
 
 Stored in the database are several tables.
