@@ -326,6 +326,10 @@ class Team
         foreach($events as $event) {
             $record = $event->getEventRecordForTeam($this->getTeamNumber());
 
+            if (!$record) {
+                continue;
+            }
+
             if ($event->isOfficial()) {
                 $officialWins += $record['wins'];
                 $officialLosses += $record['losses'];

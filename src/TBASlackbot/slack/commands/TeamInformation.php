@@ -126,31 +126,35 @@ class TeamInformation
                     $rank = $rankings->getRankingForTeam($team->getTeamNumber());
                 }
 
-                $eventText = "Team " . $team->getTeamNumber() . ($rank == null ? ' had' : " was ranked "
-                        . $rank->getRank() . " of " . $rankings->getNumberOfRankedTeams())
-                    . ($eventRecord ? ($rank == null ? '' : ' with') . " a record of " . $eventRecord['wins']
-                        . '-' . $eventRecord['losses'] . '-' . $eventRecord['ties'] : '');
-
                 $awards = $tba->getTeamEventAwards('frc' . $teamInfoRequestedFor,
                     $event->getYear() . $event->getEventCode());
 
-                if ($awards && count($awards) > 0 || ($highestCompLevel !== 'f' && $highestCompLevel !== 'qm')) {
-                    $eventText .= " and won the following awards:";
+                $eventText = '';
 
-                    if ($highestCompLevel !== 'f' && $highestCompLevel !== 'qm') {
-                        $eventText .= "\n• " . ($highestCompLevel === 'ef' ? 'Eighth-Finalist'
-                                : ($highestCompLevel === 'qf' ? 'Quarterfinalist'
-                                    : ($highestCompLevel === 'sf' ? 'Semifinalist' : '')));
-                    }
+                if ($rank || $eventRecord || ($awards && count($awards) > 0)) {
+                    $eventText = "Team " . $team->getTeamNumber() . ($rank == null ? ' had' : " was ranked "
+                            . $rank->getRank() . " of " . $rankings->getNumberOfRankedTeams())
+                        . ($eventRecord ? ($rank == null ? '' : ' with') . " a record of " . $eventRecord['wins']
+                            . '-' . $eventRecord['losses'] . '-' . $eventRecord['ties'] : '');
 
-                    foreach($awards as $award) {
-                        $eventText .= "\n• " . $award->getName();
-                        if ($award->getRecipientAwardee()) {
-                            $eventText .= " • " . $award->getRecipientAwardee();
+                    if ($awards && count($awards) > 0 || ($highestCompLevel !== 'f' && $highestCompLevel !== 'qm')) {
+                        $eventText .= " and won the following awards:";
+
+                        if ($highestCompLevel !== 'f' && $highestCompLevel !== 'qm') {
+                            $eventText .= "\n• " . ($highestCompLevel === 'ef' ? 'Eighth-Finalist'
+                                    : ($highestCompLevel === 'qf' ? 'Quarterfinalist'
+                                        : ($highestCompLevel === 'sf' ? 'Semifinalist' : '')));
                         }
+
+                        foreach ($awards as $award) {
+                            $eventText .= "\n• " . $award->getName();
+                            if ($award->getRecipientAwardee()) {
+                                $eventText .= " • " . $award->getRecipientAwardee();
+                            }
+                        }
+                    } else if (strlen($eventText)) {
+                        $eventText .= '.';
                     }
-                } else if (strlen($eventText)) {
-                    $eventText .= '.';
                 }
 
                 $attachment = new Attachment($event->getName() . ($event->isOfficial() ? '' : ' (Unofficial)'),

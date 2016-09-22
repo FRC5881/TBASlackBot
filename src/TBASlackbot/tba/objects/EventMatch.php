@@ -156,7 +156,8 @@ class EventMatch
      * @return bool true if either the score breakdown is present, or an alliance has a score applied
      */
     public function isComplete() {
-        return $this->getScoreBreakdown() != null || $this->getAlliances()->getBlueScore() != null;
+        return $this->getScoreBreakdown() != null
+        || ($this->getAlliances()->getBlueScore() != null && $this->getAlliances()->getBlueScore() >= 0);
     }
 
     /**

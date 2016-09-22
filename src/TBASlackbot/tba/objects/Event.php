@@ -327,7 +327,7 @@ class Event
      * Gets the W-L-T record for the team at this event across all matches.
      *
      * @param int $team Team number
-     * @return array of 'wins', 'losses', and 'ties'
+     * @return array|null of 'wins', 'losses', and 'ties' or null if no record
      */
     public function getEventRecordForTeam($team) {
         $matches = $this->getEventMatchesForTeam($team);
@@ -336,23 +336,26 @@ class Event
         $ties = 0;
 
         foreach ($matches as $match) {
-            $winningAlliance = $match->getWinningAlliance();
+            if ($match->isComplete()) {
+                $winningAlliance = $match->getWinningAlliance();
 
-            if ($winningAlliance == null) {
-                $ties++;
-            } else {
-                $alliance = $match->getAlliances()->getAllianceForTeam($team);
-                // Note, it can't be null since we're already in the match somewhere....
-
-                if ($alliance == $winningAlliance) {
-                    $wins++;
+                if ($winningAlliance == null) {
+                    $ties++;
                 } else {
-                    $losses++;
+                    $alliance = $match->getAlliances()->getAllianceForTeam($team);
+                    // Note, it can't be null since we're already in the match somewhere....
+
+                    if ($alliance == $winningAlliance) {
+                        $wins++;
+                    } else {
+                        $losses++;
+                    }
                 }
             }
         }
 
-        return array('wins' => $wins, 'losses' => $losses, 'ties' => $ties);
+        return $wins > 0 || $losses > 0 || $ties > 0
+            ? array('wins' => $wins, 'losses' => $losses, 'ties' => $ties) : null;
     }
 
     /**

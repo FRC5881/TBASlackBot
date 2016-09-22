@@ -90,6 +90,13 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
+                    $attachment =  new Attachment('Future Events and Scheduled Match Fixes - Sept 22, 2016',
+                        "Teams attending a future event that has a posted schedule (such as Chezy Champs) were "
+                        . "considering those matches in W-L-T records. Also improved unplayed match detection "
+                        . "to handle corner case of a -1 score.");
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
                     $attachment =  new Attachment('Live Events and Future Updates - Sept 21, 2016',
                         "First, welcome to all our new users in Open Beta! We have been waiting to test the "
                         . "following features during live events this off season. Unfortunately, all of the "
