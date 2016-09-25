@@ -396,6 +396,23 @@ class ProcessMessage
 
         $client->postMessage($message);
 
-        $loop->run();
+        $success = false;
+
+        try {
+            $loop->run();
+            $success = true;
+        } catch (\Exception $e) {
+            error_log("\nException in send_reply: " . $e->getMessage() . "\n");
+        }
+
+        if (!$success) {
+            error_log("\nRetrying Last Message\n");
+
+            try {
+                $loop->run();
+            } catch (\Exception $e) {
+                error_log("\nException in retry send_reply: " . $e->getMessage() . "\n");
+            }
+        }
     }
 }
