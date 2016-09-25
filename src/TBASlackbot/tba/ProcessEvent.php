@@ -143,6 +143,7 @@ class ProcessEvent
         foreach($subs as $channelId => $sub) {
             if ($sub['subscriptionType'] !== 'summary') {
                 $event = $tba->getEvent($match->getEventKey());
+                $attachments = array();
 
                 $replyText = 'Followed Team' . (count($sub['frcTeams']) == 1 ? ' ' : 's ')
                     . implode(', ', $sub['frcTeams']) . ' have completed '
