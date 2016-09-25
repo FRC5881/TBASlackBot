@@ -113,7 +113,7 @@ class ProcessEvent
                     . implode(', ', $sub['frcTeams']) . ' will be playing soon at ' . $upcomingMatch->getEventName()
                     . ' in ' . EventMatch::getStringForCompLevel($match->getCompetitionLevel()) . 's '
                     . ($match->getCompetitionLevel() === 'qm' || $match->getCompetitionLevel() === 'f' ? ''
-                        : $match->getSetNumber())
+                        : $match->getSetNumber() . ' ')
                     . 'match ' . $match->getMatchNumber() . ' • '
                     . '<https://thebluealliance.com/match/' . $match->getKey() . '|View on TBA>';
 
