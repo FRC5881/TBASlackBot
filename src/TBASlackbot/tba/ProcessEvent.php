@@ -107,6 +107,8 @@ class ProcessEvent
 
         foreach($subs as $channelId => $sub) {
             if ($sub['subscriptionType'] === 'all') {
+                $attachments = array();
+
                 $replyText = 'Followed Team' . (count($sub['frcTeams']) == 1 ? ' ' : 's ')
                     . implode(', ', $sub['frcTeams']) . ' will be playing soon at ' . $upcomingMatch->getEventName()
                     . ' in ' . EventMatch::getStringForCompLevel($match->getCompetitionLevel()) . 's '
@@ -114,8 +116,23 @@ class ProcessEvent
                         : $match->getSetNumber())
                     . 'match ' . $match->getMatchNumber() . ' • '
                     . '<https://thebluealliance.com/match/' . $match->getKey() . '|View on TBA>';
+
+                if ($upcomingMatch->getTeamNumbers() && count($upcomingMatch->getTeamNumbers()) == 6) {
+                    $attachment = new Attachment('Red Alliance', $upcomingMatch->getTeamNumbers()[0] . ' - '
+                        . $upcomingMatch->getTeamNumbers()[1] . ' - ' . $upcomingMatch->getTeamNumbers()[2],
+                        null, '#FF0000');
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
+                    $attachment = new Attachment('Blue Alliance', $upcomingMatch->getTeamNumbers()[3] . ' - '
+                        . $upcomingMatch->getTeamNumbers()[4] . ' - ' . $upcomingMatch->getTeamNumbers()[5],
+                        null, '#0000FF');
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+                }
+
                 ProcessMessage::sendReply($sub['teamId'], Channels::getChannelCache($sub['teamId'], $channelId),
-                    $replyText, null);
+                    $replyText, null, $attachments);
             }
         }
     }
