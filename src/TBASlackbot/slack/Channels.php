@@ -48,7 +48,7 @@ class Channels
 
         $cached = $db->getSlackChannelCache($channelId);
 
-        if ($cached && $cached['lastAccess'] + Channels::$MAX_AGE >= time()) {
+        if ($cached && ($cached['lastAccess'] + Channels::$MAX_AGE) >= time()) {
             return $cached;
         }
 
@@ -82,7 +82,24 @@ class Channels
                 error_log("Unknown channel type detection for $channelId");
         }
 
-        $loop->run();
+        $success = false;
+
+        try {
+            $loop->run();
+            $success = true;
+        } catch (\Exception $e) {
+            error_log("\nException in getChannelCache: " . $e->getMessage() . "\n");
+        }
+
+        if (!$success) {
+            error_log("\nRetrying Last Channel Request\n");
+
+            try {
+                $loop->run();
+            } catch (\Exception $e) {
+                error_log("\nException in retry getChannelCache: " . $e->getMessage() . "\n");
+            }
+        }
 
         return $db->getSlackChannelCache($channelId);
     }

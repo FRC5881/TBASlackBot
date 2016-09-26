@@ -46,7 +46,7 @@ class Users
 
         $cached = $db->getSlackUserCache($userId);
 
-        if ($cached && $cached['lastAccess'] + Users::$MAX_AGE >= time()) {
+        if ($cached && ($cached['lastAccess'] + Users::$MAX_AGE) >= time()) {
             return $cached;
         }
 
@@ -60,7 +60,24 @@ class Users
             $db->setSlackUserCache($teamId, $user->getId(), $user->getUsername());
         });
 
-        $loop->run();
+        $success = false;
+
+        try {
+            $loop->run();
+            $success = true;
+        } catch (\Exception $e) {
+            error_log("\nException in getUserCache: " . $e->getMessage() . "\n");
+        }
+
+        if (!$success) {
+            error_log("\nRetrying Last User Request\n");
+
+            try {
+                $loop->run();
+            } catch (\Exception $e) {
+                error_log("\nException in retry getUserCache: " . $e->getMessage() . "\n");
+            }
+        }
 
         return $db->getSlackUserCache($userId);
     }
