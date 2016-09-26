@@ -166,7 +166,7 @@ class ProcessEvent
                     . implode(', ', $sub['frcTeams']) . ' have completed '
                     . EventMatch::getStringForCompLevel($match->getCompetitionLevel()) . 's '
                     . ($match->getCompetitionLevel() === 'qm' || $match->getCompetitionLevel() === 'f' ? ''
-                        : $match->getSetNumber())
+                        : $match->getSetNumber() . ' ')
                     . 'match ' . $match->getMatchNumber() . ' at '
                     . ($event->getShortName() ? $event->getShortName() : $event->getName())
                     . ' • ' . '<https://thebluealliance.com/match/' . $match->getKey() . '|View on TBA>';
@@ -347,6 +347,9 @@ class ProcessEvent
                 $teamNumbers = array_merge($teamNumbers, $match->getAlliances()->getRedTeams());
             }
         }
+
+        $teamNumbers = array_unique($teamNumbers);
+        sort($teamNumbers);
 
         $subs = null;
 
