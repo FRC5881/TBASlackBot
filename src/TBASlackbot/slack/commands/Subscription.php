@@ -53,6 +53,9 @@ class Subscription
         }
 
         $db = new DB();
+
+        $current = $db->getSlackTeamSubscription($teamId, $channelCache['channelId'], $team->getTeamNumber());
+
         $db->setSlackTeamSubscription($teamId, $channelCache['channelId'], $team->getTeamNumber(), $level,
             $requestedBy);
 
@@ -73,8 +76,9 @@ class Subscription
 
 
         ProcessMessage::sendReply($teamId, $channelCache, Random::replyRandomizer($replyOptions, $rareReplyOptions)
-            . " Now watching for $updateType for team "
-            . $team->getTeamNumber() . " (" . $team->getNickname() . ") and will update this channel as they come in. "
+            . ($current ? " Updating your existing subscription to $updateType" : " Now watching for $updateType")
+            . " for team " . $team->getTeamNumber()
+            . " (" . $team->getNickname() . ") and will update this channel as they come in. "
             . "To stop, just ask me to *_unfollow " . $team->getTeamNumber() . "_* from this channel.", $replyTo);
     }
 
