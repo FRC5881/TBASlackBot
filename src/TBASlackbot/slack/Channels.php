@@ -127,4 +127,69 @@ class Channels
 
         return null;
     }
+
+    /**
+     * Gets a ChannelCache for the DM channel between the bot and a given user on a team
+     *
+     * @param String $teamId Slack team id
+     * @param String $userId Slack user id
+     * @return array|bool cached channel information, array fields are named per the MySQL slackChannelCache table,
+     * false on error
+     */
+    public static function getUserDmChannelCache($teamId, $userId) {
+        $db = new DB();
+
+        $user = Users::getUserCache($teamId, $userId);
+
+        if ($user) {
+            $channelCache = $db->getSlackChannelCacheByNameAndType($teamId, '@' . $user['userName'], 'im');
+
+            if ($channelCache) {
+                return $channelCache;
+            }
+
+            $oauth = $db->getSlackTeamOAuth($teamId);
+
+            $loop = Factory::create();
+            $client = new ApiClient($loop);
+            $client->setToken($oauth['botAccessToken']);
+
+            $client->getDMByUserId($user['userId'])->then(function (DirectMessageChannel $channel) use ($db, $oauth) {
+                $username = Users::getUserCache($oauth['teamId'], $channel->data['user'])['userName'];
+                $db->setSlackChannelCache($oauth['teamId'], $channel->getId(), '@'.$username, 'im', true);
+            });
+
+            $success = false;
+
+            try {
+                $loop->run();
+                $success = true;
+            } catch (\Exception $e) {
+                error_log("\nException in getUserDmChannelCache: " . $e->getMessage() . "\n");
+            }
+
+            if (!$success) {
+                error_log("\nRetrying Last Channel Request\n");
+
+                try {
+                    $loop->run();
+                } catch (\Exception $e) {
+                    error_log("\nException in retry getUserDmChannelCache: " . $e->getMessage() . "\n");
+                }
+            }
+
+            $channelCache = $db->getSlackChannelCacheByNameAndType($teamId, '@' . $user['userName'], 'im');
+
+            if ($channelCache) {
+                return $channelCache;
+            } else {
+                error_log("\nUnable to get a DM ChannelCache for UserId $userId in TeamId $teamId\n");
+            }
+
+        } else {
+            error_log("\nUnable to get a UserCache for UserId $userId in TeamId $teamId\n");
+        }
+
+        return false;
+    }
 }

@@ -90,24 +90,15 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
-                    $attachment =  new Attachment('Future Events and Scheduled Match Fixes - Sept 22, 2016',
-                        "Teams attending a future event that has a posted schedule (such as Chezy Champs) were "
-                        . "considering those matches in W-L-T records. Also improved unplayed match detection "
-                        . "to handle corner case of a -1 score.");
+                    $attachment =  new Attachment('Feedback Replies - Oct 31, 2016',
+                        "If you submitted *_feedback_* to TBABot previously, we now have the ability for TBABot "
+                        . "to send you replies. TBABot will check for replies only when it sees you active. We "
+                        . "hope this will enable us to respond to your concerns when they are resolved.");
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
 
-                    $attachment =  new Attachment('Live Events and Future Updates - Sept 21, 2016',
-                        "First, welcome to all our new users in Open Beta! We have been waiting to test the "
-                        . "following features during live events this off season. Unfortunately, all of the "
-                        . "events the last several weeks have not been able to provide FIRST/TBA with live "
-                        . "data from the field FMS, and we've been unable to fully test the feature. With 5 "
-                        . "events coming up this weekend, we may finally get to see this in action. If things "
-                        . "look weird, or data looks off, please use the _feedback_ command and let us know!\n"
-                        . "We also have a number of features planned and upgrades to do to _@tbabot_ before "
-                        . "the launch of FIRST STEAMWORKS, the next of which will be purely backend as we update "
-                        . "our caching mechanisms to reduce load on TBA.\n"
-                        . "Thanks for your patience!");
+                    $attachment =  new Attachment('Blog Post - Offseason Updates - Sept 22, 2016',
+                        "https://frc5881.github.io/TBASlackBot/jekyll/update/2016/09/26/offseason-update.html");
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
 

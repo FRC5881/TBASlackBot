@@ -20,6 +20,7 @@ namespace TBASlackbot\slack;
 use React\EventLoop\Factory;
 use Slack\ApiClient;
 use Slack\Message\Attachment;
+use TBASlackbot\slack\commands\Feedback;
 use TBASlackbot\slack\commands\Help;
 use TBASlackbot\slack\commands\Subscription;
 use TBASlackbot\slack\commands\TeamInformation;
@@ -70,6 +71,8 @@ class ProcessMessage
         } else {
             self::processConversationalMessage($teamId, $sendingUser, $messageText, $channelCache);
         }
+
+        Feedback::checkForFeedbackReply($teamId, $sendingUser);
     }
 
     /**
@@ -254,9 +257,7 @@ class ProcessMessage
                         . "after the word *_feedback_* for me to send?", $replyTo);
                     Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'error', null, null);
                 } else {
-                    $db->logFeedback($teamId, $channelCache['channelId'], $messageFrom, implode(' ', $feedbackArray));
-                    self::sendReply($teamId, $channelCache, "I'll forward your feedback right away. Thank you!",
-                        $replyTo);
+                    Feedback::processFeedbackRequest($teamId, $channelCache, $messageFrom, $feedbackArray, $replyTo);
                     Analytics::trackSlackEvent($teamId, $messageFrom, $channelCache, 'feedback', null, null);
                 }
                 break;

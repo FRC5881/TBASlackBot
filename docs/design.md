@@ -216,6 +216,35 @@ CREATE TABLE botFeedbackLog
 );
 ```
 
+#### Feedback Replies
+
+The feedback reply table contains any replies sent (to queued to be sent) in response
+to a feedback given by a bot user.
+
+| Column         | Purpose                                         |
+| -------------- | ----------------------------------------------- |
+| id             | Auto-incrementing identifier                    |
+| feedbackId     | FK to botFeedbackLog.id                         |
+| replyText      | Reply to feedback to be sent to user            |
+| replyEnteredAt | Date/Time the reply message was recorded        |
+| isSent         | True if the reply has been sent to the user     |
+| replySentAt    | Sate/Time the reply was sent to the user        |
+
+```
+CREATE TABLE botFeedbackReply
+(
+    id BIGINT(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    feedbackId BIGINT(20) NOT NULL,
+    replyText LONGTEXT NOT NULL,
+    replyEnteredAt DATETIME NOT NULL,
+    isSent TINYINT(1),
+    replySentAt DATETIME,
+    CONSTRAINT botFeedbackReply_botFeedbackLog_id_fk FOREIGN KEY (feedbackId) REFERENCES botFeedbackLog (id)
+);
+CREATE INDEX botFeedbackReply_botFeedbackLog_id_fk ON botFeedbackReply (feedbackId);
+CREATE INDEX botFeedbackReply_isSent_index ON botFeedbackReply (isSent);
+```
+
 #### Message Log
 
 The message log logs all commands received by the bot.

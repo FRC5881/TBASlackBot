@@ -170,6 +170,26 @@ class DB
     }
 
     /**
+     * Gets the cached Slack Channel info for the given team, channel name, and type.
+     *
+     * @param String $teamId Slack team ID
+     * @param String $name Slack Channel Name
+     * @param String $type Slack Channel Type
+     * @return array with fields named the same as the setter's parameters
+     */
+    public function getSlackChannelCacheByNameAndType($teamId, $name, $type) {
+        $stmt = $this->mysqli
+            ->prepare("SELECT * FROM slackChannelCache WHERE teamId = ? AND channelName = ? AND channelType = ?");
+        $stmt->bind_param("sss", $teamId, $name, $type);
+
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+
+        return $res->fetch_assoc();
+    }
+
+    /**
      * Insert or update the Slack channel cache.
      *
      * @param String $teamId Slack TeamId
@@ -460,6 +480,55 @@ class DB
 
         if ($stmt->error) {
             error_log("logFeedback DB Error: " . $stmt->error);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets any queued feedback replies
+     *
+     * @param string $teamId Slack TeamId
+     * @param string $userId Slack UserId
+     * @return array[]|bool false if no pending replies found, or an array of arrays with 'teamId', 'userId',
+     * 'feedback', 'messageTime', 'replyText', and 'id' (of the reply)
+     */
+    public function getQueuedFeedbackReplies($teamId, $userId) {
+        $stmt = $this->mysqli->prepare("SELECT l.teamId, l.userId, l.feedback, l.messageTime, r.replyEnteredAt, "
+            . "r.replyText, r.id FROM botFeedbackReply r JOIN botFeedbackLog l ON r.feedbackId = l.id "
+            . "WHERE r.isSent = 0 AND l.teamId = ? AND l.userId = ?");
+        $stmt->bind_param("ss", $teamId, $userId);
+
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+
+        $replies = null;
+
+        for ($row_no = ($res->num_rows - 1); $row_no >= 0; $row_no--) {
+            $res->data_seek($row_no);
+
+            $replies[] = $res->fetch_assoc();
+        }
+
+        return $replies;
+    }
+
+    /**
+     * Marks a given feedback reply as sent
+     *
+     * @param int $feedbackReplyId Feedback Reply ID to mark sent
+     * @return bool false if an error occurred, or true if set
+     */
+    public function setFeedbackReplySent($feedbackReplyId) {
+        $stmt = $this->mysqli->prepare("UPDATE botFeedbackReply SET replySentAt = now(), isSent = 1 WHERE id = ?");
+        $stmt->bind_param('i', $feedbackReplyId);
+
+        $stmt->execute();
+
+        if ($stmt->error) {
+            error_log("setFeedbackReplySent DB Error: " . $stmt->error);
             return false;
         }
 

@@ -23,6 +23,7 @@ require_once('slack/ProcessEvent.php');
 require_once('slack/ProcessMessage.php');
 require_once('slack/SlackSetup.php');
 require_once('slack/Users.php');
+require_once('slack/commands/Feedback.php');
 require_once('slack/commands/Help.php');
 require_once('slack/commands/Subscription.php');
 require_once('slack/commands/TeamInformation.php');
