@@ -236,6 +236,8 @@ class EventMatch
 
             // It went to the tossup, and we don't know how FMS decided.
             return null;
+        } else if ($this->getYear() == 2017) {
+            return $this->redOrBlue($this->getAlliances()->getRedScore(), $this->getAlliances()->getBlueScore());
         }
 
         return null;
