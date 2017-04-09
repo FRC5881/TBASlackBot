@@ -163,7 +163,7 @@ class ProcessEvent
                 $attachments = array();
 
                 $replyText = 'Followed Team' . (count($sub['frcTeams']) == 1 ? ' ' : 's ')
-                    . implode(', ', $sub['frcTeams']) . ' have completed '
+                    . implode(', ', $sub['frcTeams']) . ' has completed '
                     . EventMatch::getStringForCompLevel($match->getCompetitionLevel()) . 's '
                     . ($match->getCompetitionLevel() === 'qm' || $match->getCompetitionLevel() === 'f' ? ''
                         : $match->getSetNumber() . ' ')
