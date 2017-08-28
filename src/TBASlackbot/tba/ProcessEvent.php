@@ -279,8 +279,8 @@ class ProcessEvent
             // This summary is sent for all subscription types.
 
             $replyText = 'Followed Team' . (count($sub['frcTeams']) == 1 ? ' ' : 's ')
-                . implode(', ', $sub['frcTeams']) . ' have completed playing at '
-                . ($event->getShortName() ? $event->getShortName() : $event->getName())
+                . implode(', ', $sub['frcTeams']) . (count($sub['frcTeams']) == 1 ? ' has' : 'have')
+                . ' completed playing at ' . ($event->getShortName() ? $event->getShortName() : $event->getName())
                 . "\n" . '<https://thebluealliance.com/event/' . $event->getKey() . '|View Event on TBA>';
 
             $attachments = array();
