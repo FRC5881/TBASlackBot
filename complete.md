@@ -1,7 +1,7 @@
 ---
-layout: default
+layout: page
 permalink: /complete/
-title: ~
+title: Installation Complete
 ---
 
 # Installation Complete #

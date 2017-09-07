@@ -24,7 +24,20 @@ url: "https://FRC5881.github.io/" # the base hostname & protocol for your site
 
 author: FRC 5881 Programming Group
 #twitter_username: 
-github_username:  FRC5881
+github_username: FRC5881
+
+# Minima date format
+# refer to http://shopify.github.io/liquid/filters/date/ if you want to customize this
+minima:
+  date_format: "%b %-d, %Y"
+
+# If you want to link only specific pages in your header, uncomment
+# this and add the path to the pages in order as they should show up
+header_pages:
+ - about.md
+ - docs.md
+ - faq.md
+ - install.md
 
 # Build settings
 markdown: kramdown
