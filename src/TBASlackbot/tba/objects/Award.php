@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -69,7 +69,7 @@ class Award
      *
      * @return int|null recipient team number or null if an individual non-team award
      */
-    public function getRecipientTeam() {
+    public function getRecipientTeam() { // TODO Not used, but deans list is broken here, eg http://www.thebluealliance.com/api/v3/team/frc250/event/2017nytr/awards
         return $this->data->recipient_list[0]->team_number;
     }
 

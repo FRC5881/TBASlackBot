@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -45,12 +45,12 @@ class District
     }
 
     /**
-     * Gets the name of the district.
+     * Gets the display name of the district.
      *
      * @return string district name
      */
-    public function getName() {
-        return $this->data->name;
+    public function getDisplayName() {
+        return $this->data->display_name;
     }
 
     /**
@@ -63,12 +63,20 @@ class District
     }
 
     /**
-     * Since the TBA v2 Team History API uses the format <year><district> as the key for district history, we
-     * present a compatible version here.
+     * Gets the district abbreviation
      *
-     * @return string Key prepended with the year
+     * @return string district name abbreviation
      */
-    public function getYearKey() {
-        return $this->year . $this->getKey();
+    public function getAbbreviation() {
+        return $this->data->abbreviation;
+    }
+
+    /**
+     * Gets the year for the district
+     *
+     * @return int district year
+     */
+    public function getYear() {
+        return $this->data->year;
     }
 }

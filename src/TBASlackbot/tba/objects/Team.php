@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -17,7 +17,7 @@
 namespace TBASlackbot\tba\objects;
 
 
-use TBASlackbot\tba\TBAClient;
+use TBASlackbot\tba\TBAClientV3;
 
 /**
  * TBA Team Object.
@@ -31,16 +31,16 @@ class Team
     public $data;
 
     /**
-     * @var TBAClient
+     * @var TBAClientV3
      */
     private $tba;
 
     /**
      * Team constructor.
-     * @param TBAClient $TBAClient
+     * @param TBAClientV3 $TBAClient
      * @param \stdClass $data returned from team API
      */
-    public function __construct(TBAClient $TBAClient, \stdClass $data)
+    public function __construct(TBAClientV3 $TBAClient, \stdClass $data)
     {
         $this->tba = $TBAClient;
         $this->data = $data;
@@ -77,8 +77,8 @@ class Team
      *
      * @return string Locality/City
      */
-    public function getLocality() {
-        return $this->data->locality;
+    public function getCity() {
+        return $this->data->city;
     }
 
     /**
@@ -91,12 +91,12 @@ class Team
     }
 
     /**
-     * Gets the team's region/state.
+     * Gets the team's state or province.
      *
-     * @return string Region/State
+     * @return string State or Province
      */
-    public function getRegion() {
-        return $this->data->region;
+    public function getStateProvince() {
+        return $this->data->state_prov;
     }
 
     /**
@@ -114,7 +114,7 @@ class Team
      * @return string Location (city/state/country)
      */
     public function getLocation() {
-        return $this->data->location;
+        return $this->getCity() . ", " . $this->getStateProvince() . " " . $this->getCountry();
     }
 
     /**
@@ -131,8 +131,8 @@ class Team
      *
      * @return string Country name
      */
-    public function getCountryName() {
-        return $this->data->country_name;
+    public function getCountry() {
+        return $this->data->country;
     }
 
     /**
@@ -162,13 +162,9 @@ class Team
     public function getDistrict($year) {
         $teamDistricts = $this->tba->getTeamHistoryDistricts('frc' . $this->getTeamNumber());
         if ($teamDistricts != null) {
-            $code = isset($teamDistricts[$year]) ? $teamDistricts[$year] : null;
-            if ($code) {
-                $districts = $this->tba->getDistricts($year);
-                foreach($districts as $district) {
-                    if ($code === $district->getYearKey()) {
-                        return $district;
-                    }
+            foreach ($teamDistricts as $district) {
+                if ($year === $district->year) {
+                    return $district;
                 }
             }
         }
@@ -270,23 +266,22 @@ class Team
         $unofficialTies = 0;
         $unofficialCompetitions = 0;
 
-        foreach($events as $event) {
+        foreach ($events as $event) {
             $rankings = $event->getEventRankings();
             if ($rankings) {
                 $ranking = $rankings->getRankingForTeam($this->getTeamNumber());
-                if ($ranking && $ranking->isRecordAvailable()) {
-                    if ($event->isOfficial()) {
-                        $officialWins += $ranking->getWins();
-                        $officialLosses += $ranking->getLosses();
-                        $officialTies += $ranking->getTies();
-                        $officialCompetitions++;
-                    } else {
-                        $unofficialWins += $ranking->getWins();
-                        $unofficialLosses += $ranking->getLosses();
-                        $unofficialTies += $ranking->getTies();
-                        $unofficialCompetitions++;
-                    }
+                if ($event->isOfficial()) {
+                    $officialWins += $ranking->getWins();
+                    $officialLosses += $ranking->getLosses();
+                    $officialTies += $ranking->getTies();
+                    $officialCompetitions++;
+                } else {
+                    $unofficialWins += $ranking->getWins();
+                    $unofficialLosses += $ranking->getLosses();
+                    $unofficialTies += $ranking->getTies();
+                    $unofficialCompetitions++;
                 }
+
             }
         }
 
@@ -364,8 +359,20 @@ class Team
     public static function stripTagFromTeams($teams) {
         $newTeams = array();
         for ($i = 0; $i < count($teams); $i++) {
-            $newTeams[] = substr($teams[$i], 3);
+            $newTeams[] = Team::stripTagFromTeam($teams[$i]);
         }
         return $newTeams;
     }
+
+    /**
+     * Strips the 'frc' prefix from a team.
+     *
+     * @param string $team Team with 'frc' prefix
+     * @return int team number w/o 'frc' prefix
+     */
+    public static function stripTagFromTeam($team) {
+        return (int)substr($team, 3);
+    }
+
+
 }

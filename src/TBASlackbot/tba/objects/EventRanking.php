@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -39,7 +39,7 @@ class EventRanking
      * @param string[] $header header values from the event ranking API
      * @param mixed[] $data returned from event ranking API
      */
-    public function __construct($header, $data)
+    public function __construct($data, $header)
     {
         $this->header = $header;
         $this->data = $data;
@@ -51,7 +51,7 @@ class EventRanking
      * @return int rank position
      */
     public function getRank() {
-        return $this->data[0];
+        return $this->data->rank;
     }
 
     /**
@@ -60,16 +60,7 @@ class EventRanking
      * @return int team number
      */
     public function getTeam() {
-        return $this->data[1];
-    }
-
-    /**
-     * Notes if the W-L-T record through qualifications is available.
-     *
-     * @return bool true if record is available
-     */
-    public function isRecordAvailable() {
-        return $this->getOther("Record (W-L-T)") != null;
+        return Team::stripTagFromTeam($this->data->team_key);
     }
 
     /**
@@ -78,11 +69,7 @@ class EventRanking
      * @return null|int wins or null if not available
      */
     public function getWins() {
-        if ($this->getOther("Record (W-L-T)") != null) {
-            return substr($this->getOther("Record (W-L-T)"), 0, strpos($this->getOther("Record (W-L-T)"), '-'));
-        }
-
-        return null;
+        return $this->data->record->wins;
     }
 
     /**
@@ -91,13 +78,7 @@ class EventRanking
      * @return null|int losses or null if not available
      */
     public function getLosses() {
-        if ($this->getOther("Record (W-L-T)") != null) {
-            $pos = strpos($this->getOther("Record (W-L-T)"), '-') + 1;
-            return substr($this->getOther("Record (W-L-T)"), $pos,
-                strrpos($this->getOther("Record (W-L-T)"), '-') - $pos);
-        }
-
-        return null;
+        return $this->data->record->losses;
     }
 
     /**
@@ -106,11 +87,7 @@ class EventRanking
      * @return null|int ties or null if not available
      */
     public function getTies() {
-        if ($this->getOther("Record (W-L-T)") != null) {
-            return substr($this->getOther("Record (W-L-T)"), strrpos($this->getOther("Record (W-L-T)"), '-') + 1);
-        }
-
-        return null;
+        return $this->data->record->ties;
     }
 
     /**
@@ -119,8 +96,8 @@ class EventRanking
      */
     public function getOther($name) {
         for ($i = 0; $i < count($this->header); $i++) {
-            if (strtolower($name) === strtolower($this->header[$i])) {
-                return $this->data[$i];
+            if (strtolower($name) === strtolower($this->header[$i]->name)) {
+                return $this->data->extra_stats[$i];
             }
         }
 

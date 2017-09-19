@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -90,30 +90,17 @@ class Help
                         . "never notice, but sometimes my commands change, or I get new features users might want "
                         . "to know about. You'll find the recent changes below:";
 
+                    $attachment =  new Attachment('API Update - Sep 19, 2017',
+                        "TBABot now speaks The Blue Alliance's APIv3. Quite a bit of code was removed or channged "
+                        . "as a result. If you get any weird problems, or TBABot ignores a command, please leave "
+                        . "*_feedback_* or log an issue on our GitHub page.");
+                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
+                    $attachments[] = $attachment;
+
                     $attachment =  new Attachment('Feedback Replies - Oct 31, 2016',
                         "If you submitted *_feedback_* to TBABot previously, we now have the ability for TBABot "
                         . "to send you replies. TBABot will check for replies only when it sees you active. We "
                         . "hope this will enable us to respond to your concerns when they are resolved.");
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
-
-                    $attachment =  new Attachment('Blog Post - Offseason Updates - Sept 22, 2016',
-                        "https://frc5881.github.io/TBASlackBot/jekyll/update/2016/09/26/offseason-update.html");
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
-
-                    $attachment =  new Attachment('Open Beta - Sept 11, 2016',
-                        "_@tbabot_ has entered Open Beta! We're very excited, and want to thank all the teams "
-                        . "that helped test, and provide feedback during our closed beta.");
-                    $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
-                    $attachments[] = $attachment;
-
-                    $attachment =  new Attachment('Making Feedback Easier - Sept 9, 2016',
-                        "We've add a new command to TBABot, *_feedback_* that can be used to send us comments, or "
-                        . "suggestions on TBABot, or even just a quick \"Thanks!\" Please feel free to use it "
-                        . "often, especially if you have a problem. Please note that _everything_ after the word "
-                        . "feedback is saved and logged, so if you're sending feedback from your super-secret "
-                        . "strategy channel, make sure it's only your feedback in the message to @tbabot.");
                     $attachment->data['mrkdwn_in'] = ['text', 'pretext', 'fields'];
                     $attachments[] = $attachment;
 

@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -17,7 +17,7 @@
 namespace TBASlackbot\slack\commands;
 
 use TBASlackbot\slack\ProcessMessage;
-use TBASlackbot\tba\TBAClient;
+use TBASlackbot\tba\TBAClientV3;
 use TBASlackbot\utils\DB;
 use TBASlackbot\utils\Random;
 
@@ -43,7 +43,7 @@ class Subscription
             ProcessMessage::sendUnknownCommand($teamId, $channelCache);
         }
 
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
 
         $team = $tba->getTeam('frc' . $teamStatusRequestedFor);
 
@@ -91,7 +91,7 @@ class Subscription
      * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
      */
     public static function processUnfollowRequest($teamId, $channelCache, $teamStatusRequestedFor, $replyTo = null) {
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
         $db = new DB();
 
         $sub = $db->getSlackTeamSubscription($teamId, $channelCache['channelId'], $teamStatusRequestedFor);
@@ -134,7 +134,7 @@ class Subscription
      * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
      */
     public static function processFollowingRequest($teamId, $channelCache, $replyTo = null) {
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
         $db = new DB();
 
         $subs = $db->getSlackTeamSubscriptions($teamId, $channelCache['channelId']);

@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -21,6 +21,7 @@ use GuzzleHttp\Client;
 use TBASlackbot\tba\objects\Award;
 use TBASlackbot\tba\objects\District;
 use TBASlackbot\tba\objects\Event;
+use TBASlackbot\tba\objects\EventAlliances;
 use TBASlackbot\tba\objects\EventMatch;
 use TBASlackbot\tba\objects\EventMatches;
 use TBASlackbot\tba\objects\EventRankings;
@@ -29,12 +30,12 @@ use TBASlackbot\tba\objects\Team;
 use TBASlackbot\utils\DB;
 
 /**
- * Client for The Blue Alliance API v2.
+ * Client for The Blue Alliance API v.
  * @author Brian Rozmierski
  */
-class TBAClient
+class TBAClientV3
 {
-    private static $URLBASE = "https://www.thebluealliance.com/api/v2/";
+    private static $URLBASE = "https://www.thebluealliance.com/api/v3/";
 
     /**
      * @var Client
@@ -49,12 +50,12 @@ class TBAClient
     /**
      * TBAClient constructor.
      *
-     * @param string $appId The Blue Alliance X-TBA-App-Id element
+     * @param string $authKey The Blue Alliance X-TBA-Auth-Key element
      * @link https://www.thebluealliance.com/apidocs
      */
-    public function __construct($appId)
+    public function __construct($authKey)
     {
-        $this->httpClient = new Client(['headers' => ['X-TBA-App-Id' => $appId]]);
+        $this->httpClient = new Client(['headers' => ['X-TBA-Auth-Key' => $authKey]]);
         $this->db = new DB();
     }
 
@@ -113,7 +114,7 @@ class TBAClient
      * @return Event[]|null null on error or Array of Event objects, may be empty
      */
     public function getTeamEvents($teamId, $year) {
-        $events = $this->callApi("team/$teamId/$year/events");
+        $events = $this->callApi("team/$teamId/events/$year");
 
         if ($events === false) {
             error_log("Error retrieving team events $teamId/$year");
@@ -171,10 +172,10 @@ class TBAClient
      * Gets the team district history, showing each year and what, if any, district the team was in.
      *
      * @param string $teamId Team key as 'frcXXXX'
-     * @return null|array index array with season year and district code
+     * @return null|array index array with year, key, abbreviation and display_name
      */
     public function getTeamHistoryDistricts($teamId) {
-        $districts = $this->callApi("team/$teamId/history/districts");
+        $districts = $this->callApi("team/$teamId/districts");
 
         if ($districts === false) {
             error_log("Error retrieving team districts $teamId");
@@ -237,6 +238,30 @@ class TBAClient
         }
 
         return new EventMatches($matches);
+    }
+
+    /**
+     * Gets playoff alliances for a specific event.
+     *
+     * @param string $eventId Event code
+     * @return null|EventAlliances null on error or EventAlliances object
+     */
+    public function getEventAlliances($eventId) {
+        $alliances = $this->callApi("event/$eventId/alliances");
+
+        if ($alliances === false) {
+            error_log("Error retrieving event alliances for $eventId");
+            return null;
+        }
+
+        $alliances = json_decode($alliances);
+
+        if ($alliances === false) {
+            error_log("Error decoding event $eventId alliances: $alliances");
+            return null;
+        }
+
+        return new EventAlliances($alliances);
     }
 
     /**

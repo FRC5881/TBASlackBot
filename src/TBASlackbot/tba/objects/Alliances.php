@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -52,7 +52,7 @@ class Alliances
      * @return int[] array of blue team numbers
      */
     public function getBlueTeams() {
-        return Team::stripTagFromTeams($this->data->blue->teams);
+        return Team::stripTagFromTeams($this->data->blue->team_keys);
     }
 
     /**
@@ -70,7 +70,7 @@ class Alliances
      * @return int[] array of red team numbers
      */
     public function getRedTeams() {
-        return Team::stripTagFromTeams($this->data->red->teams);
+        return Team::stripTagFromTeams($this->data->red->team_keys);
     }
 
     /**

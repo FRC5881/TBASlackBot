@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -41,10 +41,8 @@ class EventRankings
     {
         $this->data = $data;
 
-        if (count($data) > 1) {
-            for ($i = 1; $i < count($data); $i++) {
-                $this->rankings[] = new EventRanking($this->data[0], $this->data[$i]);
-            }
+        foreach ($data->rankings as $ranking) {
+            $this->rankings[] = new EventRanking($ranking, $this->data->extra_stats_info);
         }
     }
 

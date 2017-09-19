@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -54,7 +54,7 @@ class ProcessEvent
                 //$compLevelStarting = new CompetitionLevelStarting($messageWrapper->message_data);
                 break;
             case 'alliance_selection':
-                $event = new Event(new TBAClient(TBASLACKBOT_TBA_APP_ID), $messageWrapper->message_data->event);
+                $event = new Event(new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN), $messageWrapper->message_data->event);
                 self::processAllianceSelection($event);
                 break;
             case 'awards_posted':
@@ -102,7 +102,7 @@ class ProcessEvent
             return;
         }
 
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
         $match = $tba->getMatch($upcomingMatch->getMatchKey());
 
         foreach($subs as $channelId => $sub) {
@@ -155,7 +155,7 @@ class ProcessEvent
             return;
         }
 
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
 
         foreach($subs as $channelId => $sub) {
             if ($sub['subscriptionType'] !== 'summary') {
@@ -246,7 +246,7 @@ class ProcessEvent
 
         $eventKey = $awards[0]->getEventKey();
 
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
 
         $event = $tba->getEvent($eventKey);
         $eventMatches = $event->getEventMatches();
@@ -334,7 +334,7 @@ class ProcessEvent
      * @param string $eventKey
      */
     public static function processScheduleUpdate($eventKey) {
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
 
         $event = $tba->getEvent($eventKey);
         $eventMatches = $event->getEventMatches();

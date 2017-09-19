@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -18,7 +18,7 @@ namespace TBASlackbot\slack\commands;
 
 use Slack\Message\Attachment;
 use TBASlackbot\slack\ProcessMessage;
-use TBASlackbot\tba\TBAClient;
+use TBASlackbot\tba\TBAClientV3;
 
 /**
  * Handles team information related commands and responses.
@@ -35,7 +35,7 @@ class TeamInformation
      * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
      */
     public static function processShortRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
 
         $teamInfoRequestedFor = 'frc' . $teamInfoRequestedFor;
 
@@ -51,7 +51,7 @@ class TeamInformation
 
         ProcessMessage::sendReply($teamId, $channelCache, "Team " . $team->getTeamNumber() . ", " . $team->getNickname()
             . " out of " . $team->getLocation()
-            . ($district == null ? '' : " in the " . $district->getName() . " region."), $replyTo);
+            . ($district == null ? '' : " in the " . $district->getDisplayName() . " region."), $replyTo);
     }
 
     /**
@@ -63,7 +63,7 @@ class TeamInformation
      * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
      */
     public static function processInfoRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
 
         $teamInfoRequestedFor = 'frc' . $teamInfoRequestedFor;
 
@@ -82,7 +82,7 @@ class TeamInformation
             . ($team->getWebsite() == null ? '' : '<' . $team->getWebsite() . '|') . $team->getNickname()
             . ($team->getWebsite() == null ? '' : '>') . ' • From ' . $team->getLocation() . "\n"
             . ($team->getRookieYear() == null ? '' : 'Founded ' . $team->getRookieYear())
-            . ($district == null ? '' : ' • ' . $district->getName() . ' District')
+            . ($district == null ? '' : ' • ' . $district->getDisplayName() . ' District')
             . ($record == null ? '' : ' • ' . $record['wins'] . '-' . $record['losses']
                 . '-' . $record['ties'] . ' in ' . $record['competitions'] . ' ' . $status->getCurrentSeason()
                 . ' Events') . ' • ' . '<https://thebluealliance.com/team/' . $team->getTeamNumber() . '|View on TBA>',
@@ -98,7 +98,7 @@ class TeamInformation
      * @param string|null $replyTo User to @ mention in the reply, or null to not mention user
      */
     public static function processDetailRequest($teamId, $channelCache, $teamInfoRequestedFor, $replyTo = null) {
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
 
         $team = $tba->getTeam('frc' . $teamInfoRequestedFor);
 
@@ -170,7 +170,7 @@ class TeamInformation
 
         ProcessMessage::sendReply($teamId, $channelCache, 'Team ' . $team->getTeamNumber() . ', ' . $team->getNickname()
             . ' out of ' . $team->getLocation()
-            . ($district == null ? '' : ' in the ' . $district->getName() . ' region') . ".\n"
+            . ($district == null ? '' : ' in the ' . $district->getDisplayName() . ' region') . ".\n"
             . ($team->getWebsite() == null ? '' : '<' . $team->getWebsite() . '> • ')
             . 'Founded in ' . $team->getRookieYear()
             . ($record == null ? '' : "\n" .$record['officialWins'] . '-' . $record['officialLosses']
@@ -197,7 +197,7 @@ class TeamInformation
         // If not playing in any events, in addition to any upcoming events, report last event rank and W-L-T,
         //  and overall W-L-T across all (and report number of official/unofficial) events
 
-        $tba = new TBAClient(TBASLACKBOT_TBA_APP_ID);
+        $tba = new TBAClientV3(TBASLACKBOT_TBA_APIV3_TOKEN);
         $status = $tba->getTBAStatus();
 
         $team = $tba->getTeam('frc' . $teamStatusRequestedFor);

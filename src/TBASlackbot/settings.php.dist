@@ -66,9 +66,9 @@ if (!defined('TBASLACKBOT')) {
      */
 
     /**
-     * TBA API X-App-ID String in the format <person's name>:<app name>:<version>
+     * TBA APIv3 Token String in the format <person's name>:<app name>:<version>
      */
-    define('TBASLACKBOT_TBA_APP_ID', 'mynameis:tbaslackbot-fork:v00');
+    define('TBASLACKBOT_TBA_APIV3_TOKEN', 'entertokenhere');
 
     /**
      * TBA API Verification String

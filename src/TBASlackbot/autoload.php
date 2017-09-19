@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -28,7 +28,7 @@ require_once('slack/commands/Help.php');
 require_once('slack/commands/Subscription.php');
 require_once('slack/commands/TeamInformation.php');
 require_once('tba/ProcessEvent.php');
-require_once('tba/TBAClient.php');
+require_once('tba/TBAClientV3.php');
 require_once('tba/objects/Alliances.php');
 require_once('tba/objects/Award.php');
 require_once('tba/objects/District.php');

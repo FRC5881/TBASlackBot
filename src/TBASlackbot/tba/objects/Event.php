@@ -1,6 +1,6 @@
 <?php
 // FRC5881 Unofficial TBA Slack Bot
-// Copyright (c) 2016.
+// Copyright (c) 2017.
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Affero General Public License as published by the Free Software Foundation, either version 3 of
@@ -17,7 +17,7 @@
 namespace TBASlackbot\tba\objects;
 
 
-use TBASlackbot\tba\TBAClient;
+use TBASlackbot\tba\TBAClientV3;
 
 /**
  * TBA Event Object.
@@ -31,17 +31,17 @@ class Event
     public $data;
 
     /**
-     * @var TBAClient
+     * @var TBAClientV3
      */
     private $tba;
 
     /**
      * Event constructor.
      *
-     * @param TBAClient $TBAClient
+     * @param TBAClientV3 $TBAClient
      * @param \stdClass $data returned from API containing a single event record
      */
-    public function __construct(TBAClient $TBAClient, $data)
+    public function __construct(TBAClientV3 $TBAClient, $data)
     {
         $this->tba = $TBAClient;
         $this->data = $data;
@@ -71,9 +71,6 @@ class Event
      * @return bool true if an official event
      */
     public function isOfficial() {
-        // Yeah, this is broken. It's if it uses official FMS, not off-season. See TBA GitHub #1607
-        //return $this->data->official;
-
         // https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L38
         // 10 is an arbitrary number in case additional types are added. All off-season/preseason is >90
         return $this->getEventType() < 10;
@@ -131,26 +128,47 @@ class Event
      * @return string|null If a district event, name of the district, otherwise null
      */
     public function getDistrictEventString() {
-        return $this->data->event_district_string;
+        if ($this->data->district && $this->data->district->dispaly_name) {
+            return $this->data->district->dispaly_name;
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Gets the event venue address.
+     * Gets the event address.
      *
-     * @return string Event venue address, may include newline escape strings \n
+     * @return string Event address, may include newline escape strings \n
      */
-    public function getVenueAddress() {
-        return $this->data->venue_address;
+    public function getAddress() {
+        return $this->data->address;
     }
 
     /**
-     * Gets the TBA District ID for the event.
+     * Gets the city the event is in.
      *
-     * @return int|null District Id
-     * @link https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/district_type.py#L6
+     * @return string Locality/City
      */
-    public function getEventDistrict() {
-        return $this->data->event_district;
+    public function getCity() {
+        return $this->data->city;
+    }
+
+    /**
+     * Gets the event's state or province.
+     *
+     * @return string State or Province
+     */
+    public function getStateProvince() {
+        return $this->data->state_prov;
+    }
+
+    /**
+     * Gets the event's country.
+     *
+     * @return string Country
+     */
+    public function getCountry() {
+        return $this->data->country;
     }
 
     /**
@@ -159,7 +177,7 @@ class Event
      * @return string Location, city, state, country
      */
     public function getLocation() {
-        return $this->data->location;
+        return $this->getCity() . ", " . $this->getStateProvince() . " " . $this->getCountry();
     }
 
     /**
@@ -183,8 +201,8 @@ class Event
     /**
      * @return array webcast information
      */
-    public function getWebcast() {
-        return $this->data->webcast;
+    public function getWebcasts() {
+        return $this->data->webcasts;
     }
 
     /**
@@ -202,7 +220,11 @@ class Event
      * @return EventAlliances Elimination Alliances
      */
     public function getAlliances() {
-        return new EventAlliances($this->data->alliances);
+        if (!isset($this->data->alliances)) {
+            $this->data->alliances = $this->tba->getEventAlliances($this->getKey());
+        }
+
+        return $this->data->alliances;
     }
 
     /**
