@@ -60,7 +60,7 @@ _@tbabot_ has a built-in __help__ system. By sending the __help__ command _@tbab
 ### Feedback, and Problem Reporting ###
 
 If you have a non-cataclysmic problem with _@tbabot_ please use the __feedback__ command to let us know. _@tbabot_
- will send us anything you type after __follow__ along with your user and Slack team information so we can track down
+ will send us anything you type after __feedback__ along with your user and Slack team information so we can track down
  the problem.
  
 Feel free to use __feedback__ for comments and suggestions as well. However, since the developers do not have access
